@@ -25,10 +25,12 @@ rule token = parse
 | "}"                                                 { RBRACE }
 | "("                                                 { LPAREN }
 | ")"                                                 { RPAREN }
+| "->"                                                { ARROW }
 | "++"                                                { INCR }
 | "--"                                                { DESINCR }
 | "&&"                                                { AND }
 | "."                                                 { DOT }
+| "use"                                               { USE }
 | "fun"                                               { FUN }
 | "+"                                                 { PLUS }
 | "-"                                                 { MINUS }

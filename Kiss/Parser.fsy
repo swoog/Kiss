@@ -5,9 +5,13 @@ open AbstractSyntax
 %start start
 %token <string> NAME
 %token <int> INT
+%token LBRACE RBRACE
+%token LPAREN RPAREN
 %token PLUS MINUS
-%token EOF VAR IF ELSE LBRACE RBRACE LPAREN RPAREN INCR 
-%token DESINCR AND DOT FUN EQUAL STRING SEMI
+%token VAR IF ELSE INCR USE
+%token FUN ARROW
+%token DESINCR AND DOT EQUAL STRING SEMI
+%token EOF
 %type < AbstractSyntax.Prog > start
 
 
@@ -19,12 +23,13 @@ start: File EOF { $1 }
 
 File: StatementList { Program(List.rev($1)) }
 
-Expression: INT { Int($1) }
-          | Expression PLUS Expression { Add($1, $3) }
+Expression: INT                                 { Int($1) }
+          | LBRACE RBRACE                       { New }
+          | USE LPAREN NAME RPAREN              { Use($3) }
+          | FUN LPAREN RPAREN ARROW Expression  { Fun([], $5) }
+          | Expression PLUS Expression          { Add($1, $3) }
 
 Statement: VAR NAME EQUAL Expression { Assign($2, $4) }
 
 StatementList: Statement                    { [$1] }
              | StatementList SEMI Statement { $3::$1 }
-
-
