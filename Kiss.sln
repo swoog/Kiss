@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25029.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kiss", "Kiss\Kiss.fsproj", "{C49E2803-E9B4-42C2-B8D3-152E2E7B9D3A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Kiss.Tests", "Kiss.Tests\Kiss.Tests.fsproj", "{5332F81F-C471-4BCC-89CD-197A86C0B3A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{C49E2803-E9B4-42C2-B8D3-152E2E7B9D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C49E2803-E9B4-42C2-B8D3-152E2E7B9D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C49E2803-E9B4-42C2-B8D3-152E2E7B9D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5332F81F-C471-4BCC-89CD-197A86C0B3A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5332F81F-C471-4BCC-89CD-197A86C0B3A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5332F81F-C471-4BCC-89CD-197A86C0B3A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5332F81F-C471-4BCC-89CD-197A86C0B3A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

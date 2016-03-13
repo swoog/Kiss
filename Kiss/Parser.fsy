@@ -3,7 +3,11 @@ open AbstractSyntax
 %}
 
 %start start
-%token EOF VAR IF ELSE LBRACE RBRACE LPAREN RPAREN INCR DESINCR AND DOT FUN EQUAL WORD STRING
+%token <string> NAME
+%token <int> INT
+%token PLUS MINUS
+%token EOF VAR IF ELSE LBRACE RBRACE LPAREN RPAREN INCR 
+%token DESINCR AND DOT FUN EQUAL STRING SEMI
 %type < AbstractSyntax.Prog > start
 
 
@@ -11,8 +15,16 @@ open AbstractSyntax
 
 
 start: File EOF { $1 } 
- 
-File: 
-	| VAR						{ Program } 
+
+
+File: StatementList { Program(List.rev($1)) }
+
+Expression: INT { Int($1) }
+          | Expression PLUS Expression { Add($1, $3) }
+
+Statement: VAR NAME EQUAL Expression { Assign($2, $4) }
+
+StatementList: Statement                    { [$1] }
+             | StatementList SEMI Statement { $3::$1 }
 
 

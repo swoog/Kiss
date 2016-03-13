@@ -7,6 +7,7 @@ open Microsoft.FSharp.Text.Lexing
 let newline (lexbuf: LexBuffer<_>) =  
    lexbuf.StartPos <- lexbuf.StartPos.NextLine 
 
+let lexeme = LexBuffer.LexemeString
 }
 
 let digit = ['0'-'9']
@@ -29,8 +30,11 @@ rule token = parse
 | "&&"                                                { AND }
 | "."                                                 { DOT }
 | "fun"                                               { FUN }
+| "+"                                                 { PLUS }
+| "-"                                                 { MINUS }
 | "="                                                 { EQUAL }
-| ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*            { WORD }
+| ['0'-'9']+                                          { INT(int(lexeme lexbuf)) }
+| ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*            { NAME(lexeme lexbuf) }
 | ""                                                  { STRING }
-| _                                                   { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
+| _                                                   { failwith ("Parse error on " + LexBuffer<_>.LexemeString lexbuf) }
 | eof                                                 { EOF }

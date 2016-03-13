@@ -6,6 +6,12 @@
 open System.IO
 open Microsoft.FSharp.Text.Lexing
 
+let LexParseOfString (code:string)= 
+    use textReader = new System.IO.StringReader(code)
+    let lexbuf = LexBuffer<char>.FromTextReader textReader
+
+    Parser.start Lexer.token lexbuf
+
 let LexParse (fileName:string)= 
     use textReader = new System.IO.StreamReader(fileName)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
