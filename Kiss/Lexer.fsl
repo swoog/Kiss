@@ -1,0 +1,36 @@
+﻿{
+module Lexer 
+
+open Parser
+open Microsoft.FSharp.Text.Lexing
+
+let newline (lexbuf: LexBuffer<_>) =  
+   lexbuf.StartPos <- lexbuf.StartPos.NextLine 
+
+}
+
+let digit = ['0'-'9']
+let whitespace = [' ' '\t' ]
+let newline = ('\n' | '\r' '\n')
+
+
+rule token = parse
+| whitespace                                          { token lexbuf }
+| newline                                             { newline lexbuf; token lexbuf }
+| "var"                                               { VAR }
+| "if"                                                { IF }
+| "else"                                              { ELSE }
+| "{"                                                 { LBRACE }
+| "}"                                                 { RBRACE }
+| "("                                                 { LPAREN }
+| ")"                                                 { RPAREN }
+| "++"                                                { INCR }
+| "--"                                                { DESINCR }
+| "&&"                                                { AND }
+| "."                                                 { DOT }
+| "fun"                                               { FUN }
+| "="                                                 { EQUAL }
+| ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*            { WORD }
+| ""                                                  { STRING }
+| _                                                   { failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
+| eof                                                 { EOF }

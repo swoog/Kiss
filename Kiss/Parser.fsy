@@ -1,0 +1,18 @@
+﻿%{
+open AbstractSyntax
+%}
+
+%start start
+%token EOF VAR IF ELSE LBRACE RBRACE LPAREN RPAREN INCR DESINCR AND DOT FUN EQUAL WORD STRING
+%type < AbstractSyntax.Prog > start
+
+
+%%
+
+
+start: File EOF { $1 } 
+ 
+File: 
+	| VAR						{ Program } 
+
+
