@@ -24,6 +24,7 @@ start: File EOF { $1 }
 File: StatementList { Program(List.rev($1)) }
 
 Expression: INT                                                   { Int($1) }
+          | NAME LPAREN RPAREN                                    { Call($1) }
           | NAME                                                  { Variable($1) }
           | LBRACE RBRACE                                         { New }
           | USE LPAREN NAME RPAREN                                { Use($3) }

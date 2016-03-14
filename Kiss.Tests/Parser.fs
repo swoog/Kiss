@@ -56,3 +56,11 @@
         let expected = 
             Program([Create("returnOne", Fun([], [Create("v", Int(1)); Return(Variable("v"))]))])
         Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should parse call method``() = 
+        let line = "var returnOne = fun() -> 1; \nreturn returnOne();"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call("returnOne"))])
+        Assert.Equal(expected, abstractsyntax)

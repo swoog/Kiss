@@ -12,5 +12,6 @@ and Expression =
 | Add of Expression * Expression
 | New
 | Use of string
+| Call of string
 | Fun of string list * Statement list
 | Variable of string
