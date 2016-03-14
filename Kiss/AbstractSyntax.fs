@@ -1,13 +1,15 @@
 ﻿module AbstractSyntax
 
-type Expression =
+type Prog = Program of Statement list
+
+and Statement = 
+| Assign of string * Expression
+| Return of Expression
+
+and Expression =
 | Int of int
 | Add of Expression * Expression
 | New
 | Use of string
-| Fun of string list * Expression
-
-type Statement = 
-| Assign of string * Expression
-
-type Prog = Program of Statement list
+| Fun of string list * Statement list
+| Variable of string

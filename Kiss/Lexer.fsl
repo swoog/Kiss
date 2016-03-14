@@ -19,6 +19,7 @@ rule token = parse
 | whitespace                                          { token lexbuf }
 | newline                                             { newline lexbuf; token lexbuf }
 | "var"                                               { VAR }
+| "return"                                            { RETURN }
 | "if"                                                { IF }
 | "else"                                              { ELSE }
 | "{"                                                 { LBRACE }
@@ -35,6 +36,7 @@ rule token = parse
 | "+"                                                 { PLUS }
 | "-"                                                 { MINUS }
 | "="                                                 { EQUAL }
+| ";"                                                 { SEMI }
 | ['0'-'9']+                                          { INT(int(lexeme lexbuf)) }
 | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*            { NAME(lexeme lexbuf) }
 | ""                                                  { STRING }

@@ -10,6 +10,7 @@ type token =
   | SEMI
   | FUN
   | ARROW
+  | RETURN
   | VAR
   | IF
   | ELSE
@@ -33,6 +34,7 @@ type tokenId =
     | TOKEN_SEMI
     | TOKEN_FUN
     | TOKEN_ARROW
+    | TOKEN_RETURN
     | TOKEN_VAR
     | TOKEN_IF
     | TOKEN_ELSE
