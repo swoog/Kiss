@@ -6,11 +6,14 @@
 open System.IO
 open Microsoft.FSharp.Text.Lexing
 
+exception ParsingError of string
+
 let LexParseOfString (code:string)= 
     use textReader = new System.IO.StringReader(code)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
-
-    Parser.start Lexer.token lexbuf
+    try Parser.start Lexer.token lexbuf
+    with e ->  let lex = (Lexer.token lexbuf)
+               raise (ParsingError("Line " + lexbuf.EndPos.Line.ToString()))
 
 let LexParse (fileName:string)= 
     use textReader = new System.IO.StreamReader(fileName)

@@ -64,3 +64,13 @@
         let expected = 
             Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call("returnOne"))])
         Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should throw error when parsing is false``() = 
+        let line = "var returnOne = \nfun() -> 1 \nreturn returnOne();"
+        try 
+            Program.LexParseOfString line |> ignore
+            raise(System.Exception("Expected ParseError"))
+        with
+        | ParsingError(x) -> Assert.Equal("Line 2", x)
+        | _ -> raise(System.Exception("Expected ParseError"))
