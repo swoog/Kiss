@@ -3,6 +3,7 @@
 type Prog = Program of Statement list
 
 and Statement = 
+| Create of string * Expression
 | Assign of string * Expression
 | Return of Expression
 
