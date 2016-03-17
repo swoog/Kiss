@@ -99,11 +99,42 @@
             Program([Create("variableName", New([]));Assign(Property(Variable("variableName"), "Prop1"), Int(1))])
         Assert.Equal(expected, abstractsyntax)
 
-
     [<Fact>]
     let ``Should set sub property of object``() = 
         let line = "var variableName = { Prop1 = {} }; variableName.Prop1.SubProp = 1;"
         let abstractsyntax = Program.LexParseOfString line
         let expected = 
             Program([Create("variableName", New([PropertySetter("Prop1", New([]))]));Assign(Property(Property(Variable("variableName"), "Prop1"), "SubProp"), Int(1))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should greater than``() = 
+        let line = "var v = 1 > 0;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", Greater(Int(1), Int(0)))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should less than``() = 
+        let line = "var v = 1 < 0;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", Less(Int(1), Int(0)))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should greate or equal than``() = 
+        let line = "var v = 1 >= 0;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", GreaterOrEqual(Int(1), Int(0)))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should less or equal than``() = 
+        let line = "var v = 1 <= 0;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", LessOrEqual(Int(1), Int(0)))])
         Assert.Equal(expected, abstractsyntax)

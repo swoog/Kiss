@@ -9,6 +9,10 @@ type token =
   | STRING
   | SEMI
   | COMMA
+  | GREATER
+  | LESS
+  | GREATEREQUAL
+  | LESSEQUAL
   | FUN
   | ARROW
   | RETURN
@@ -34,6 +38,10 @@ type tokenId =
     | TOKEN_STRING
     | TOKEN_SEMI
     | TOKEN_COMMA
+    | TOKEN_GREATER
+    | TOKEN_LESS
+    | TOKEN_GREATEREQUAL
+    | TOKEN_LESSEQUAL
     | TOKEN_FUN
     | TOKEN_ARROW
     | TOKEN_RETURN

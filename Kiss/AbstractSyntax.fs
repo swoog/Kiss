@@ -15,6 +15,10 @@ and Expression =
 | Call of string
 | Fun of string list * Statement list
 | Get of Variable
+| Greater of Expression * Expression
+| GreaterOrEqual of Expression * Expression
+| Less of Expression * Expression
+| LessOrEqual of Expression * Expression
 
 and Property = 
 | PropertySetter of string * Expression
@@ -22,3 +26,4 @@ and Property =
 and Variable = 
 | Variable of string
 | Property of Variable * string
+
