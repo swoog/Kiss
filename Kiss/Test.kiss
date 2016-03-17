@@ -7,14 +7,16 @@ main.Run = fun() ->
 	var ninja = { Life = 3 };
 	var badNinja = { Life = 3 };
 	
-	ninja.IsAlive = fun(n) -> n.Life > 0;
+	ninja.IsAlive = fun() -> ninja.Life > 0;
+	badNinja.IsAlive = fun() -> ninja.Life > 0;
 	ninja.Sword = fun(n) -> n.Life--;
+	badNinja.Sword = fun(n) -> n.Life--;
 
 	while(badninja.IsAlive() && ninja.IsAlive())
 	{
 		if(rand.Next(100)>50)
 		{
-			Ninja.Sword(badNinja);
+			ninja.Sword(badNinja);
 		}
 		else
 		{

@@ -33,6 +33,7 @@ rule token = parse
 | "."                                                 { DOT }
 | "use"                                               { USE }
 | "fun"                                               { FUN }
+| ","                                                 { COMMA }
 | "+"                                                 { PLUS }
 | "-"                                                 { MINUS }
 | "="                                                 { EQUAL }

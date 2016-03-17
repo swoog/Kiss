@@ -8,6 +8,7 @@ type token =
   | EQUAL
   | STRING
   | SEMI
+  | COMMA
   | FUN
   | ARROW
   | RETURN
@@ -32,6 +33,7 @@ type tokenId =
     | TOKEN_EQUAL
     | TOKEN_STRING
     | TOKEN_SEMI
+    | TOKEN_COMMA
     | TOKEN_FUN
     | TOKEN_ARROW
     | TOKEN_RETURN
@@ -54,6 +56,9 @@ type nonTerminalId =
     | NONTERM__startstart
     | NONTERM_start
     | NONTERM_File
+    | NONTERM_PropertyInitializer
+    | NONTERM_PropertiesInitializer
+    | NONTERM_Variable
     | NONTERM_Expression
     | NONTERM_Statement
     | NONTERM_StatementList

@@ -8,20 +8,21 @@ open Microsoft.FSharp.Text.Lexing
 
 exception ParsingError of string
 
-let LexParseOfString (code:string)= 
-    use textReader = new System.IO.StringReader(code)
+let LexParseOfTextReader textReader =
     let lexbuf = LexBuffer<char>.FromTextReader textReader
     try Parser.start Lexer.token lexbuf
     with e ->  let lex = (Lexer.token lexbuf)
                raise (ParsingError("Line " + lexbuf.EndPos.Line.ToString()))
 
+
+let LexParseOfString (code:string)= 
+    use textReader = new System.IO.StringReader(code)
+    LexParseOfTextReader textReader
+
 let LexParse (fileName:string)= 
     use textReader = new System.IO.StreamReader(fileName)
-    let lexbuf = LexBuffer<char>.FromTextReader textReader
-
-    let countFromParser = Parser.start Lexer.token lexbuf
-
-    Interpreter.Run countFromParser
+    let abstractSyntax = LexParseOfTextReader textReader
+    Interpreter.Run abstractSyntax
 
 
 

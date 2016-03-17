@@ -14,7 +14,7 @@
     let ``Should parse two statements when assign new value``() = 
         let line = "var variableName = 1;\nvariableName = 2;"
         let abstractsyntax = Program.LexParseOfString line
-        let expected = Program([Create("variableName", Int(1));Assign("variableName", Int(2))])
+        let expected = Program([Create("variableName", Int(1));Assign(Variable("variableName"), Int(2))])
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>] 
@@ -34,14 +34,6 @@
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>]
-    let ``Should parse one statement when initialized by empty object``() = 
-        let line = "var variableName = {};"
-        let abstractsyntax = Program.LexParseOfString line
-        let expected = 
-            Program([Create("variableName", New)])
-        Assert.Equal(expected, abstractsyntax)
-
-    [<Fact>]
     let ``Should parse expression method``() = 
         let line = "var returnOne = fun() -> 1;"
         let abstractsyntax = Program.LexParseOfString line
@@ -54,7 +46,7 @@
         let line = "var returnOne = fun() -> {\n var v = 1; \nreturn v;\n};"
         let abstractsyntax = Program.LexParseOfString line
         let expected = 
-            Program([Create("returnOne", Fun([], [Create("v", Int(1)); Return(Variable("v"))]))])
+            Program([Create("returnOne", Fun([], [Create("v", Int(1)); Return(Get(Variable("v")))]))])
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>]
@@ -74,3 +66,44 @@
         with
         | ParsingError(x) -> Assert.Equal("Line 2", x)
         | _ -> raise(System.Exception("Expected ParseError"))
+
+    [<Fact>]
+    let ``Should parse one statement when initialized by empty object``() = 
+        let line = "var variableName = {};"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("variableName", New([]))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should initialized object when set one property``() = 
+        let line = "var variableName = { Prop1 = 1};"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("variableName", New([PropertySetter("Prop1", Int(1))]))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should initialized object when set two property``() = 
+        let line = "var variableName = { Prop1 = 1, Prop2 = 2};"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("variableName", New([PropertySetter("Prop1", Int(1));PropertySetter("Prop2", Int(2))]))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should set property of object``() = 
+        let line = "var variableName = { }; variableName.Prop1 = 1;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("variableName", New([]));Assign(Property(Variable("variableName"), "Prop1"), Int(1))])
+        Assert.Equal(expected, abstractsyntax)
+
+
+    [<Fact>]
+    let ``Should set sub property of object``() = 
+        let line = "var variableName = { Prop1 = {} }; variableName.Prop1.SubProp = 1;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("variableName", New([PropertySetter("Prop1", New([]))]));Assign(Property(Property(Variable("variableName"), "Prop1"), "SubProp"), Int(1))])
+        Assert.Equal(expected, abstractsyntax)
