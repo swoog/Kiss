@@ -6,9 +6,9 @@ open Parser
 open Microsoft.FSharp.Text.Lexing
 
 let newline (lexbuf: LexBuffer<_>) =  
-   lexbuf.EndPos <- lexbuf.EndPos.AsNewLinePos() 
+   lexbuf.EndPos <- lexbuf.EndPos.NextLine 
 
-let lexeme = LexBuffer.LexemeString
+let lexeme = LexBuffer<_>.LexemeString
 
 # 13 "Lexer.fs"
 let trans : uint16[] array = 

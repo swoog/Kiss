@@ -1,4 +1,4 @@
-﻿module Parser
+﻿module ParserTests
     open Xunit 
     open Program
     open AbstractSyntax

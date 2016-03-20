@@ -1,4 +1,7 @@
 ﻿module Interpreter
 
-let Run x = match x with 
- Program -> ();;
+open AbstractSyntax
+
+let Run x = 
+    match x with 
+    | Program(_) -> ();;
