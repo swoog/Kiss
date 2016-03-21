@@ -1,6 +1,4 @@
-﻿var main= {};
-
-main.Run = fun() -> 
+﻿var main= { Run = fun() -> 
 {
 	var console = use(Console);
 	var rand = use (Random);
