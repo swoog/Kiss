@@ -37,24 +37,28 @@ let getPropertyType objectType propertyName =
     | Type(name, properties) -> getPropertyTypeFromProperties properties propertyName
     | _ -> raise(TypeError((typeToString objectType) + " has no property " + propertyName))
 
-let rec checkTypeProperties properties =
+let compareType type1 type2 = 
+    if type1 = type2 then
+        type1
+    else
+        raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
+
+let rec checkTypeProperties properties typeAccu=
     match properties with
     | [] -> []
-    | PropertySetter(name, e)::l -> (name, (checkTypeExpression e))::(checkTypeProperties l)
+    | PropertySetter(name, e)::l -> (name, (checkTypeExpression e typeAccu))::(checkTypeProperties l typeAccu)
 
-and checkTypeExpression (a:Expression) = 
+and checkTypeExpression (a:Expression) typeAccu = 
     match a with
     | Int(_) -> TypeInt
     | Float(_) -> TypeFloat
-    | New(properties) -> Type(newName, (checkTypeProperties properties))
-    | Add(ex1, ex2) -> let type1 = (checkTypeExpression ex1)
-                       let type2 = (checkTypeExpression ex2)
-                       in if type1 = type2 then 
-                           type1 
-                          else 
-                           raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
+    | New(properties) -> Type(newName, (checkTypeProperties properties typeAccu))
+    | Add(ex1, ex2) -> compareType 
+                            (checkTypeExpression ex1 typeAccu)
+                            (checkTypeExpression ex2 typeAccu)
     | Fun(parameters, statements) -> let returnStatementType = (checkTypeStatements statements [] [])
                                      in TypeFunc([], returnStatementType)
+    | Get(variable) -> checkTypeVariable variable typeAccu []
 
 and checkTypeVariable (a:Variable) typeAccu propertyTypeAccu = 
     match a with
@@ -64,8 +68,8 @@ and checkTypeVariable (a:Variable) typeAccu propertyTypeAccu =
 
 and checkTypeStatement a typeAccu propertyTypeAccu = 
     match a with 
-    | Create(name, e) -> (name, (checkTypeExpression e))::typeAccu
-    | Assign(variable, e) -> let expressionType = (checkTypeExpression e)
+    | Create(name, e) -> (name, (checkTypeExpression e typeAccu))::typeAccu
+    | Assign(variable, e) -> let expressionType = (checkTypeExpression e typeAccu)
                              let variableType = (checkTypeVariable variable typeAccu propertyTypeAccu)
                              in if expressionType = variableType then
                                     typeAccu
@@ -76,7 +80,7 @@ and checkTypeStatement a typeAccu propertyTypeAccu =
 and checkTypeStatements (a:Statement list) typeAccu propertyTypeAccu = 
     match a with
     | [] -> TypeVoid
-    | (Return(a))::l -> checkTypeExpression a
+    | (Return(a))::l -> checkTypeExpression a typeAccu
     | a::l -> let typeAccu = checkTypeStatement a typeAccu propertyTypeAccu
                 in checkTypeStatements l typeAccu propertyTypeAccu
 

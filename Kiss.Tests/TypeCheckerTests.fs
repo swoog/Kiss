@@ -14,6 +14,10 @@
         | TypeError(x) -> Assert.Equal(errorMessage, x)
         | e -> raise(System.Exception("Expected TypeError received " + e.ToString()))
 
+    let expectedCorrect lines = 
+        let isCheck = checkTypeProg (statement lines)
+        Assert.True(isCheck)
+
 
     [<Fact>] 
     let ``Should type is correct when check create variable``() = 
@@ -36,12 +40,10 @@
 
     [<Fact>] 
     let ``Should type is correct when check assign variable with object``() = 
-        let lines = [
+        [
             Create("variableName", New([]));
             Assign(Variable("variableName"), New([]))
-        ]
-        let isCheck = checkTypeProg (statement lines)
-        Assert.True(isCheck)
+        ] |> expectedCorrect
 
     [<Fact>] 
     let ``Should type is correct when check assign variable with object initialized with property``() = 
@@ -107,12 +109,10 @@
 
     [<Fact>] 
     let ``Should type is correct when check func and assign new func``() = 
-        let lines = [
+        [
             Create("variableName", Fun([], [Return(Int(1))]));
             Assign(Variable("variableName"), Fun([], [Return(Int(2))]))
-        ]
-        let isCheck = checkTypeProg (statement lines)
-        Assert.True(isCheck)
+        ] |> expectedCorrect
 
     [<Fact>] 
     let ``Should type is incorrect when check func and assign new func of float``() = 
@@ -121,3 +121,9 @@
             Assign(Variable("variableName"), Fun([], [Return(Float(2.0))]))
         ] |> expectedTypeError "Variable is not of type func() : float"
 
+    [<Fact(Skip="WIP")>] 
+    let ``Should type is correct when check func add``() = 
+        [
+            Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]));
+            Assign(Variable("variableName"), Fun([], [Return(Int(2))]))
+        ] |> expectedCorrect
