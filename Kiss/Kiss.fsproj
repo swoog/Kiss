@@ -69,6 +69,7 @@
       <OtherFlags>--unicode</OtherFlags>
     </FsLex>
     <Compile Include="AbstractSyntax.fs" />
+    <Compile Include="TypedAbstractSyntax.fs" />
     <Compile Include="Interpreter.fs" />
     <Compile Include="Parser.fsi" />
     <Compile Include="Parser.fs" />
