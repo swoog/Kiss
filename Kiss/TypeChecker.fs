@@ -63,7 +63,7 @@ and checkTypeExpression (a:Expression) typeAccu =
                                      let (ty, statements) = returnStatementType 
                                      in (TypeFunc([], ty), TypedFun([], statements))
     | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu []
-                       in (variableType, TypedGet(TypedVariable("")))
+                       in (variableType, TypedGet(variable))
 
 and checkTypeVariable (a:Variable) typeAccu propertyTypeAccu = 
     match a with

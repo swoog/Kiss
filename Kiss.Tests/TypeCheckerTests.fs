@@ -35,6 +35,16 @@
         ] |> expectedTypeError "Variable is not of type float"
 
     [<Fact>] 
+    let ``Should type is correct when assign variable to create variable``() = 
+        [
+            Create("v1", Int(1));
+            Create("v2", Get(Variable("v1")));
+        ] |> expectedCorrect [
+            TypedCreate(TypeInt, "v1", TypedInt(1));
+            TypedCreate(TypeInt, "v2", TypedGet(TypedVariable("v1")));
+        ]
+
+    [<Fact>] 
     let ``Should type is correct when check create variable with object``() = 
         [
             Create("variableName", New([]))
