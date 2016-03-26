@@ -147,5 +147,8 @@
         [
             Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]))
         ] |> expectedCorrect [
-            TypedCreate(TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), "variableName", TypedFun([], []));
+            TypedCreate(
+                TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), 
+                "variableName", 
+                TypedFun(["x";"y"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y"))))]));
         ]
