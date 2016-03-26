@@ -152,3 +152,14 @@
                 "variableName", 
                 TypedFun(["x";"y"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y"))))]));
         ]
+
+    [<Fact>] 
+    let ``Should type is correct when check func add with int``() = 
+        [
+            Create("variableName", Fun(["x"], [Return(Add(Get(Variable("x")), Int(1)))]))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeInt], TypeInt), 
+                "variableName", 
+                TypedFun(["x"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedInt(1)))]));
+        ]
