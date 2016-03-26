@@ -24,6 +24,9 @@
         match v with
         | Variable(v) -> Variable(getVariable v variables)
         | Property(v, p) -> Property(closureVariable v variables, p)
+    and closurePropertie variables p =
+        match p with
+        | PropertySetter(name, e) -> PropertySetter(name, closureExpression e variables)
     and closureExpression e variables = 
         match e with
         | Int(i) -> Int(i)
@@ -31,6 +34,8 @@
         | Get(v) -> Get(closureVariable v variables)
         | Fun(p, ss) -> Fun(p, closureStatements ss variables)
         | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
+        | Call(v) -> Call(closureVariable v variables)
+        | New(ps) -> New(List.map (closurePropertie variables) ps)
 
     and closureStatement s variables = 
         match s with

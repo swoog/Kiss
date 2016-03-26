@@ -37,6 +37,29 @@
             Create("v-1", Get(Variable("v")))
         ]
 
+    [<Fact>] 
+    let ``Should make closure when is a call``() = 
+        [
+            Create("v", Fun([], [Return(Int(1))]));
+            Create("v", Call(Variable("v")));
+            Create("v", Call(Variable("v")))
+        ] |> expectedCorrect [
+            Create("v", Fun([], [Return(Int(1))]));
+            Create("v-1", Call(Variable("v")));
+            Create("v-1-1", Call(Variable("v-1")))
+        ]
+
+    [<Fact>] 
+    let ``Should make closure when is a new``() = 
+        [
+            Create("v", Fun([], [Return(Int(1))]));
+            Create("v", Call(Variable("v")));
+            Create("v", New([PropertySetter("P", Get(Variable("v")))]))
+        ] |> expectedCorrect [
+            Create("v", Fun([], [Return(Int(1))]));
+            Create("v-1", Call(Variable("v")));
+            Create("v-1-1", New([PropertySetter("P", Get(Variable("v-1")))]))
+         ]
 
     [<Fact>] 
     let ``Should return new name when have two create variable with same name``() = 
