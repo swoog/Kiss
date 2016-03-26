@@ -197,3 +197,31 @@
         [
             Return(Float(1.0))
         ] |> expectedTypeError "Program must be of type int or void"
+
+    [<Fact>] 
+    let ``Should type is correct when check use console``() = 
+        [
+            Create("variableName", Use("Console"))
+        ] |> expectedCorrect [
+            TypedCreate(
+                Type("Console", [("Write", TypeFunc([TypeGeneric("T1")], TypeVoid))]), 
+                "variableName", 
+                TypedUse("Console"))
+        ]
+
+    [<Fact>] 
+    let ``Should type is correct when check use random``() = 
+        [
+            Create("variableName", Use("Random"))
+        ] |> expectedCorrect [
+            TypedCreate(
+                Type("Random", []), 
+                "variableName", 
+                TypedUse("Random"))
+        ]
+
+    [<Fact>] 
+    let ``Should type is incorrect when check use of undefinedtype``() = 
+        [
+            Create("variableName", Use("undefinedtype"))
+        ] |> expectedTypeError "Use of undefinedtype is not found"

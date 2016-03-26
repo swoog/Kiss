@@ -2,6 +2,11 @@
 	{ 
 		Run = fun() -> 
 		{
+			var console = use(Console);
+			var rand = use (Random);
+			var ninja = { Life = 3 };
+			var badNinja = { Life = 3 };
+
 			return 0;
 		}
 	};

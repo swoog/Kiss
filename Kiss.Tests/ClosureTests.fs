@@ -147,3 +147,11 @@
             Create("v-1", Fun([], [Assign(Variable("v"), Int(2)); Create("v-1", Get(Variable("v"))); Return(Get(Variable("v-1")))]));
             Assign(Variable("v-1"), Fun([], []))
         ]
+
+    [<Fact>] 
+    let ``Should do nothing when closure of use``() = 
+        [
+            Create("variableName", Use("console"))
+        ] |> expectedCorrect [
+            Create("variableName", Use("console"))
+        ]

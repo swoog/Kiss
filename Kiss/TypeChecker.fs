@@ -59,6 +59,15 @@ let addGenericParameters typeAccu parameters =
         | a::l -> (a, TypeGeneric("T" + count.ToString()))::(addGenericParameters typeAccu l (count + 1))
     in addGenericParameters typeAccu parameters 1
 
+let checkTypeUse name = 
+    match name with
+    | "Console" -> Type("Console", [
+                        ("Write", TypeFunc([TypeGeneric("T1")], TypeVoid))
+                    ]);
+    | "Random" -> Type("Random", [
+                    ]);
+    | t -> raise(TypeError("Use of " + t + " is not found"))
+
 let rec checkTypeProperties properties typeAccu=
     match properties with
     | [] -> ([], [])
@@ -86,6 +95,7 @@ and checkTypeExpression (a:Expression) typeAccu =
                         match variableType with
                         | TypeFunc(_, returnType) -> (typeAccu, returnType, TypedCall(variable))
                         | _ -> raise(TypeError("Variable must be of type Fun()"))
+    | Use(name) -> (typeAccu, checkTypeUse name, TypedUse(name))
 
 and checkTypeVariable (a:Variable) typeAccu = 
     match a with

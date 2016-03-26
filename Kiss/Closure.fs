@@ -36,6 +36,7 @@
         | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
         | Call(v) -> Call(closureVariable v variables)
         | New(ps) -> New(List.map (closurePropertie variables) ps)
+        | Use(name) -> Use(name)
 
     and closureStatement s variables = 
         match s with
