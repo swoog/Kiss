@@ -2,8 +2,6 @@
 open AbstractSyntax
 open TypedAbstractSyntax
 
-exception ParsingError of string
-
 let mutable counter = 0
 
 let newName = 
@@ -23,7 +21,7 @@ let rec typeToString t =
 
 let rec getType typeAccu name = 
     match typeAccu with
-    | [] -> raise(ParsingError("Error to search type of variable" + name))
+    | [] -> raise(TypeError("Error to search type of variable " + name))
     | (variableName, valueType)::l -> if variableName = name then valueType else (getType l name)
 
 let rec getPropertyTypeFromProperties properties propertyName =
@@ -79,8 +77,8 @@ and checkTypeExpression (a:Expression) typeAccu =
                             (checkTypeExpression ex1 typeAccu)
                             (checkTypeExpression ex2 typeAccu)
     | Fun(parameters, statements) -> let typeAccuWithParameters = addGenericParameters typeAccu parameters
-                                     let (typeAccu, ty, statements) = (checkTypeStatements statements typeAccuWithParameters)
-                                     let paramatersTypes = List.map (getType typeAccu) parameters
+                                     let (subTypeAccu, ty, statements) = (checkTypeStatements statements typeAccuWithParameters)
+                                     let paramatersTypes = List.map (getType subTypeAccu) parameters
                                      in (typeAccu, TypeFunc(paramatersTypes, ty), TypedFun(parameters, statements))
     | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
                        in (typeAccu, variableType, TypedGet(variable))
@@ -102,7 +100,7 @@ and checkTypeStatement a typeAccu =
                                    (typeAccu, TypedAssign(variable, t))
                                 else
                                    raise(TypeError("Variable is not of type " + (typeToString typeExpression)))
-    | Return(_) -> raise(ParsingError("check statement incorrect"))
+    | Return(_) -> raise(TypeError("check statement incorrect"))
 
 and checkTypeStatements (a:Statement list) typeAccu = 
     match a with

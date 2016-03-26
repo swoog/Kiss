@@ -163,3 +163,10 @@
                 "variableName", 
                 TypedFun(["x"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedInt(1)))]));
         ]
+
+    [<Fact>] 
+    let ``Should type is incorrect when check parameter out off scope of func``() = 
+        [
+            Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]))
+            Create("variableName2", Get(Variable("x")))
+        ] |> expectedTypeError "Error to search type of variable x"
