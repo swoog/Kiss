@@ -67,6 +67,7 @@ type nonTerminalId =
     | NONTERM_PropertyInitializer
     | NONTERM_PropertiesInitializer
     | NONTERM_Variable
+    | NONTERM_Parameters
     | NONTERM_Expression
     | NONTERM_Statement
     | NONTERM_StatementList

@@ -4,7 +4,7 @@
 		{
 			var console = use(Console);
 			var rand = use (Random);
-			var ninja = { Life = 3 };
+			var ninja = { Life = 3, IsAlive = fun(x) -> x.Life > 0};
 			var badNinja = { Life = 3 };
 
 			return 0;

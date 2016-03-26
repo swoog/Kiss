@@ -41,6 +41,16 @@
             Program([Create("returnOne", Fun([], [Return(Int(1))]))])
         Assert.Equal(expected, abstractsyntax)
 
+    let expected expect line = 
+        let abstractsyntax = Program.LexParseOfString line
+        Assert.Equal(expect, abstractsyntax)
+
+    [<Fact>]
+    let ``Should parse expression method when have parameter``() = 
+        "var f = fun(x) -> x;"
+        |> expected (Program([Create("f", Fun(["x"], [Return(Get(Variable("x")))]))]))
+
+
     [<Fact>]
     let ``Should parse expression method When have multiple line``() = 
         let line = "var returnOne = fun() -> {\n var v = 1; \nreturn v;\n};"
@@ -51,27 +61,18 @@
 
     [<Fact>]
     let ``Should parse expression method When have recursion``() = 
-        let line = "var f1 = fun() -> {var f2 = fun() -> {return 1;};};"
-        let abstractsyntax = Program.LexParseOfString line
-        let expected = 
-            Program([Create("f1", Fun([], [Create("f2",Fun([], [Return(Int(1))]))]))])
-        Assert.Equal(expected, abstractsyntax)
+        "var f1 = fun() -> {var f2 = fun() -> {return 1;};};"
+        |> expected (Program([Create("f1", Fun([], [Create("f2",Fun([], [Return(Int(1))]))]))]))
 
     [<Fact>]
     let ``Should parse expression method When is property``() = 
-        let line = "var c = { P = fun() -> {return 1;}};"
-        let abstractsyntax = Program.LexParseOfString line
-        let expected = 
-            Program([Create("c", New([PropertySetter("P", Fun([], [Return(Int(1))]))]))])
-        Assert.Equal(expected, abstractsyntax)
+        "var c = { P = fun() -> {return 1;}};"
+        |> expected (Program([Create("c", New([PropertySetter("P", Fun([], [Return(Int(1))]))]))]))
 
     [<Fact>]
     let ``Should parse call method``() = 
-        let line = "var returnOne = fun() -> 1; \nreturn returnOne();"
-        let abstractsyntax = Program.LexParseOfString line
-        let expected = 
-            Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call(Variable("returnOne")))])
-        Assert.Equal(expected, abstractsyntax)
+        "var returnOne = fun() -> 1; \nreturn returnOne();"
+        |> expected (Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call(Variable("returnOne")))]))
 
     [<Fact>]
     let ``Should throw error when parsing is false``() = 
@@ -82,6 +83,7 @@
         with
         | ParsingError(x) -> Assert.Equal("Line 2", x)
         | _ -> raise(System.Exception("Expected ParseError"))
+
 
     [<Fact>]
     let ``Should parse one statement when initialized by empty object``() = 
@@ -162,3 +164,5 @@
         let expected = 
             Program([Return(Call(Property(Variable("c"),"Method")))])
         Assert.Equal(expected, abstractsyntax)
+
+

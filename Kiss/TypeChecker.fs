@@ -62,10 +62,10 @@ let addGenericParameters typeAccu parameters =
 let checkTypeUse name = 
     match name with
     | "Console" -> Type("Console", [
-                        ("Write", TypeFunc([TypeGeneric("T1")], TypeVoid))
-                    ]);
+                                     ("Write", TypeFunc([TypeGeneric("T1")], TypeVoid))
+                                   ]);
     | "Random" -> Type("Random", [
-                    ]);
+                                 ]);
     | t -> raise(TypeError("Use of " + t + " is not found"))
 
 let rec checkTypeProperties properties typeAccu=

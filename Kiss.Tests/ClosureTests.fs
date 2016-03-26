@@ -50,6 +50,18 @@
         ]
 
     [<Fact>] 
+    let ``Should make closure when have Fun with parameter``() = 
+        [
+            Create("v", Fun(["x"], [Return(Get(Variable("x")))]));
+            Create("v", Call(Variable("v")));
+            Create("v", New([PropertySetter("P", Get(Variable("v")))]))
+        ] |> expectedCorrect [
+            Create("v", Fun(["x"], [Return(Get(Variable("x")))]));
+            Create("v-1", Call(Variable("v")));
+            Create("v-1-1", New([PropertySetter("P", Get(Variable("v-1")))]))
+         ]
+
+    [<Fact>] 
     let ``Should make closure when is a new``() = 
         [
             Create("v", Fun([], [Return(Int(1))]));
@@ -154,4 +166,52 @@
             Create("variableName", Use("console"))
         ] |> expectedCorrect [
             Create("variableName", Use("console"))
+        ]
+
+    [<Fact>] 
+    let ``Should change name when check closure of greater``() = 
+        [
+            Create("v", Int(0));
+            Create("v", Int(0));
+            Create("v", Greater(Get(Variable("v")), Get(Variable("v"))))
+        ] |> expectedCorrect [
+            Create("v", Int(0));
+            Create("v-1", Int(0));
+            Create("v-1-1", Greater(Get(Variable("v-1")), Get(Variable("v-1"))))
+        ]
+
+    [<Fact>] 
+    let ``Should change name when check closure of greater or equal``() = 
+        [
+            Create("v", Int(0));
+            Create("v", Int(0));
+            Create("v", GreaterOrEqual(Get(Variable("v")), Get(Variable("v"))))
+        ] |> expectedCorrect [
+            Create("v", Int(0));
+            Create("v-1", Int(0));
+            Create("v-1-1", GreaterOrEqual(Get(Variable("v-1")), Get(Variable("v-1"))))
+        ]
+
+    [<Fact>] 
+    let ``Should change name when check closure of less``() = 
+        [
+            Create("v", Int(0));
+            Create("v", Int(0));
+            Create("v", Less(Get(Variable("v")), Get(Variable("v"))))
+        ] |> expectedCorrect [
+            Create("v", Int(0));
+            Create("v-1", Int(0));
+            Create("v-1-1", Less(Get(Variable("v-1")), Get(Variable("v-1"))))
+        ]
+
+    [<Fact>] 
+    let ``Should change name when check closure of less or equal``() = 
+        [
+            Create("v", Int(0));
+            Create("v", Int(0));
+            Create("v", LessOrEqual(Get(Variable("v")), Get(Variable("v"))))
+        ] |> expectedCorrect [
+            Create("v", Int(0));
+            Create("v-1", Int(0));
+            Create("v-1-1", LessOrEqual(Get(Variable("v-1")), Get(Variable("v-1"))))
         ]

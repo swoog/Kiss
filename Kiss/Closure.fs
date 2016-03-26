@@ -12,6 +12,13 @@
                                     else
                                         let (l, newName) = createVariable name l
                                         in ((oldName, newName)::l, newName)
+    let rec createVariables names variables =
+        match names with
+        | [] -> (variables, [])
+        | a::l -> let (variables, newName) = createVariable a variables
+                  let (variables, newNames) = createVariables l variables
+                  in (variables, newName::newNames)
+
     let rec getVariable v variables =
         match variables with
         | [] -> raise(NotFoundVariable)
@@ -32,11 +39,16 @@
         | Int(i) -> Int(i)
         | Float(f) -> Float(f)
         | Get(v) -> Get(closureVariable v variables)
-        | Fun(p, ss) -> Fun(p, closureStatements ss variables)
+        | Fun(p, ss) -> let (variables, newNames) = (createVariables p variables)
+                        in Fun(newNames, closureStatements ss variables)
         | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
         | Call(v) -> Call(closureVariable v variables)
         | New(ps) -> New(List.map (closurePropertie variables) ps)
         | Use(name) -> Use(name)
+        | Greater(ex1, ex2) -> Greater(closureExpression ex1 variables, closureExpression ex2 variables)
+        | GreaterOrEqual(ex1, ex2) -> GreaterOrEqual(closureExpression ex1 variables, closureExpression ex2 variables)
+        | Less(ex1, ex2) -> Less(closureExpression ex1 variables, closureExpression ex2 variables)
+        | LessOrEqual(ex1, ex2) -> LessOrEqual(closureExpression ex1 variables, closureExpression ex2 variables)
 
     and closureStatement s variables = 
         match s with
