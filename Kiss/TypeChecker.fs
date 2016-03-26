@@ -68,42 +68,42 @@ and checkTypeExpression (a:Expression) typeAccu =
                             (checkTypeExpression ex1 typeAccu)
                             (checkTypeExpression ex2 typeAccu)
     | Fun(parameters, statements) -> let typeAccuWithParameters = addGenericParameters typeAccu parameters
-                                     let (ty, statements) = (checkTypeStatements statements typeAccuWithParameters [])
+                                     let (ty, statements) = (checkTypeStatements statements typeAccuWithParameters)
                                      in (TypeFunc([], ty), TypedFun([], statements))
-    | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu []
+    | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
                        in (variableType, TypedGet(variable))
 
-and checkTypeVariable (a:Variable) typeAccu propertyTypeAccu = 
+and checkTypeVariable (a:Variable) typeAccu = 
     match a with
     | Variable(name) -> ((getType typeAccu name), TypedVariable(name))
-    | Property(variable, propertyName) -> let (objectType, variable) = checkTypeVariable variable typeAccu propertyTypeAccu
+    | Property(variable, propertyName) -> let (objectType, variable) = checkTypeVariable variable typeAccu 
                                           in (getPropertyType objectType propertyName, TypedProperty(variable, propertyName))
 
-and checkTypeStatement a typeAccu propertyTypeAccu = 
+and checkTypeStatement a typeAccu = 
     match a with 
     | Create(name, e) -> let (typeExpression, t) = (checkTypeExpression e typeAccu)
                          let typeAccu = (name, typeExpression)::typeAccu
                          in (typeAccu, TypedCreate(typeExpression, name, t))
     | Assign(variable, e) -> let (typeExpression, t) = (checkTypeExpression e typeAccu) 
-                             let (variableType, variable) = (checkTypeVariable variable typeAccu propertyTypeAccu)
+                             let (variableType, variable) = (checkTypeVariable variable typeAccu)
                              in if typeExpression = variableType then
                                    (typeAccu, TypedAssign(variable, t))
                                 else
                                    raise(TypeError("Variable is not of type " + (typeToString typeExpression)))
     | Return(_) -> raise(ParsingError("check statement incorrect"))
 
-and checkTypeStatements (a:Statement list) typeAccu propertyTypeAccu = 
+and checkTypeStatements (a:Statement list) typeAccu = 
     match a with
     | [] -> (TypeVoid, [])
     | (Return(a))::l -> let (typeExpression, t) = checkTypeExpression a typeAccu
                         in (typeExpression, [TypedReturn(t)])
-    | a::l -> let (typeAccu, statement) = checkTypeStatement a typeAccu propertyTypeAccu
-              let (t, s) = checkTypeStatements l typeAccu propertyTypeAccu
+    | a::l -> let (typeAccu, statement) = checkTypeStatement a typeAccu
+              let (t, s) = checkTypeStatements l typeAccu
               in (t, statement::s)
 
 and checkTypeProg (a:Prog) = 
     match a with
-    | Program(x) -> let s = checkTypeStatements x [] []
+    | Program(x) -> let s = checkTypeStatements x []
                     in match s with 
                        | (TypeVoid, s) -> TypedProgram(s)
                        | _ -> raise(TypeError("Program must be of type void"))
