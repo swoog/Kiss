@@ -1,32 +1,9 @@
-﻿var main= { Run = fun() -> 
-{
-	var console = use(Console);
-	var rand = use (Random);
-	var ninja = { Life = 3 };
-	var badNinja = { Life = 3 };
-	
-	ninja.IsAlive = fun() -> ninja.Life > 0;
-	badNinja.IsAlive = fun() -> ninja.Life > 0;
-	ninja.Sword = fun(n) -> n.Life--;
-	badNinja.Sword = fun(n) -> n.Life--;
-
-	while(badninja.IsAlive() && ninja.IsAlive())
-	{
-		if(rand.Next(100)>50)
+﻿var main= 
+	{ 
+		Run = fun() -> 
 		{
-			ninja.Sword(badNinja);
+			return 0;
 		}
-		else
-		{
-			Badninja.Sword(ninja);
-		}
+	};
 
-		console.Write(ninja.Life);
-		console.Write(" - ");
-		console.Write(badNinja.Life);
-	}
-	
-	return 0;
-};
-
-return main.Run()
+return main.Run();

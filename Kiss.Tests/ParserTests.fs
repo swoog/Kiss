@@ -50,11 +50,27 @@
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>]
+    let ``Should parse expression method When have recursion``() = 
+        let line = "var f1 = fun() -> {var f2 = fun() -> {return 1;};};"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("f1", Fun([], [Create("f2",Fun([], [Return(Int(1))]))]))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should parse expression method When is property``() = 
+        let line = "var c = { P = fun() -> {return 1;}};"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("c", New([PropertySetter("P", Fun([], [Return(Int(1))]))]))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
     let ``Should parse call method``() = 
         let line = "var returnOne = fun() -> 1; \nreturn returnOne();"
         let abstractsyntax = Program.LexParseOfString line
         let expected = 
-            Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call("returnOne"))])
+            Program([Create("returnOne", Fun([], [Return(Int(1))]));Return(Call(Variable("returnOne")))])
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>]
@@ -137,4 +153,12 @@
         let abstractsyntax = Program.LexParseOfString line
         let expected = 
             Program([Create("v", LessOrEqual(Int(1), Int(0)))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>]
+    let ``Should parse call method of property``() = 
+        let line = "return c.Method();"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Return(Call(Property(Variable("c"),"Method")))])
         Assert.Equal(expected, abstractsyntax)

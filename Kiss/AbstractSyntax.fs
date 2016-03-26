@@ -13,7 +13,7 @@ and Expression =
 | Add of Expression * Expression
 | New of Property list
 | Use of string
-| Call of string
+| Call of Variable
 | Fun of string list * Statement list
 | Get of Variable
 | Greater of Expression * Expression

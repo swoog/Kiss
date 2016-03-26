@@ -33,18 +33,18 @@ PropertiesInitializer: PropertyInitializer                                 { [$1
 Variable: NAME                                                             { Variable($1) }
         | Variable DOT NAME                                                { Property($1, $3) }
 
-Expression: Variable                                                       { Get($1) }
+Expression: Variable LPAREN RPAREN                                         { Call($1) }
+          | Variable                                                       { Get($1) }
+          | INT                                                            { Int($1) }
+          | LBRACE RBRACE                                                  { New([]) }
+          | LBRACE PropertiesInitializer RBRACE                            { New(List.rev($2)) }
+          | USE LPAREN NAME RPAREN                                         { Use($3) }
+          | FUN LPAREN RPAREN ARROW Expression                             { Fun([], [Return($5)]) }
+          | FUN LPAREN RPAREN ARROW LBRACE StatementList RBRACE            { Fun([], List.rev($6)) }
           | Expression GREATER Expression                                  { Greater($1, $3) }
           | Expression LESS Expression                                     { Less($1, $3) }
           | Expression GREATEREQUAL Expression                             { GreaterOrEqual($1, $3) }
           | Expression LESSEQUAL Expression                                { LessOrEqual($1, $3) }
-          | INT                                                            { Int($1) }
-          | NAME LPAREN RPAREN                                             { Call($1) }
-          | LBRACE RBRACE                                                  { New([]) }
-          | LBRACE PropertiesInitializer RBRACE                            { New(List.rev($2)) }
-          | USE LPAREN NAME RPAREN                                         { Use($3) }
-          | FUN LPAREN RPAREN ARROW LBRACE StatementList RBRACE            { Fun([], List.rev($6)) }
-          | FUN LPAREN RPAREN ARROW Expression                             { Fun([], [Return($5)]) }
           | Expression PLUS Expression                                     { Add($1, $3) }
 
 Statement: VAR NAME EQUAL Expression                                       { Create($2, $4) }

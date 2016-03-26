@@ -77,6 +77,7 @@
     <None Include="Test.kiss">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Closure.fs" />
     <Compile Include="TypeChecker.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

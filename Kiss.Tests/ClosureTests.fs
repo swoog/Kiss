@@ -3,68 +3,20 @@
     open Program
     open AbstractSyntax
     open TypeChecker
-
-    exception NotFoundVariable
+    open Closure
 
     let statement a = Program(a)
 
-    let rec createVariable name variables = 
-        match variables with
-        | [] -> ([(name, name)], name)
-        | (oldName, newName)::l -> if oldName = name then
-                                        let newName2 = newName + "-1"
-                                        ((oldName, newName2)::((oldName, newName)::l), newName2)
-                                    else
-                                        let (l, newName) = createVariable name l
-                                        in ((oldName, newName)::l, newName)
-    let rec getVariable v variables =
-        match variables with
-        | [] -> raise(NotFoundVariable)
-        | (oldName, newName)::l -> if oldName = v then
-                                     newName
-                                   else
-                                     getVariable v l
-
-    let rec closureVariable v variables =
-        match v with
-        | Variable(v) -> Variable(getVariable v variables)
-        | Property(v, p) -> Property(closureVariable v variables, p)
-    and closureExpression e variables = 
-        match e with
-        | Int(i) -> Int(i)
-        | Float(f) -> Float(f)
-        | Get(v) -> Get(closureVariable v variables)
-        | Fun(p, ss) -> Fun(p, closureStatements ss variables)
-        | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
-
-    and closureStatement s variables = 
-        match s with
-        | Create(name, e) -> let e = closureExpression e variables
-                             let (variables, newName) = createVariable name variables
-                             in (variables, Create(newName, e))
-        | Assign(v, e) -> (variables, Assign(closureVariable v variables, closureExpression e variables))
-        | Return(e) -> (variables, Return(closureExpression e variables))
-    
-    and closureStatements ss variables = 
-        match ss with
-        | [] -> []
-        | s::l -> let (variables, s) = closureStatement s variables
-                  in s::(closureStatements l variables)
-
-    and closure p = 
-        match p with
-        | Program(t) -> Program(closureStatements t [])
-
     let expectedTypeError errorMessage lines =
         try
-            closure (statement lines) |> ignore
+            closureProgram (statement lines) |> ignore
             raise(System.Exception("Expected TypeError received no exception"))
         with
         | TypeError(x) -> Assert.Equal(errorMessage, x)
         | e -> raise(System.Exception("Expected TypeError received " + e.ToString()))
 
     let expectedCorrect expectedLines lines= 
-        let resultats = closure (statement lines)
+        let resultats = closureProgram (statement lines)
         Assert.Equal(Program(expectedLines), resultats)
 
     [<Fact>] 

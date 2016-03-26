@@ -7,6 +7,7 @@ open System.IO
 open Microsoft.FSharp.Text.Lexing
 open AbstractSyntax
 open TypeChecker
+open Closure
 
 exception ParsingError of string
 
@@ -23,9 +24,11 @@ let LexParseOfString (code:string)=
 
 let LexParse (fileName:string)= 
     use textReader = new System.IO.StreamReader(fileName)
-    let abstractSyntax = LexParseOfTextReader textReader
-    let isCheckType = checkTypeProg abstractSyntax
-    Interpreter.Run abstractSyntax
+    textReader 
+        |> LexParseOfTextReader
+        |> closureProgram
+        |> checkTypeProg
+        |> Interpreter.Run
 
 
 [<EntryPoint>]

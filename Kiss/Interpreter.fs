@@ -1,7 +1,7 @@
 ﻿module Interpreter
 
-open AbstractSyntax
+open TypedAbstractSyntax
 
 let Run x = 
     match x with 
-    | Program(_) -> ();;
+    | TypedProgram(_) -> ();;
