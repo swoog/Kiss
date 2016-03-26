@@ -170,3 +170,30 @@
             Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]))
             Create("variableName2", Get(Variable("x")))
         ] |> expectedTypeError "Error to search type of variable x"
+
+    [<Fact>] 
+    let ``Should type is correct when check call of func``() = 
+        [
+            Create("variableName", Fun(["x"], [Return(Add(Get(Variable("x")), Int(1)))]));
+            Create("result", Call(Variable("variableName")))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeInt], TypeInt), 
+                "variableName", 
+                TypedFun(["x"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedInt(1)))]));
+            TypedCreate(TypeInt, "result", TypedCall(TypedVariable("variableName")))
+        ]
+
+    [<Fact>] 
+    let ``Should type is correct when program return int``() = 
+        [
+            Return(Int(1))
+        ] |> expectedCorrect [
+            TypedReturn(TypedInt(1))
+        ]
+
+    [<Fact>] 
+    let ``Should type is incorrect when program return other from int and void``() = 
+        [
+            Return(Float(1.0))
+        ] |> expectedTypeError "Program must be of type int or void"

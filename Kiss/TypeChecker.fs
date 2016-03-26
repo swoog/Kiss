@@ -82,6 +82,10 @@ and checkTypeExpression (a:Expression) typeAccu =
                                      in (typeAccu, TypeFunc(paramatersTypes, ty), TypedFun(parameters, statements))
     | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
                        in (typeAccu, variableType, TypedGet(variable))
+    | Call(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
+                        match variableType with
+                        | TypeFunc(_, returnType) -> (typeAccu, returnType, TypedCall(variable))
+                        | _ -> raise(TypeError("Variable must be of type Fun()"))
 
 and checkTypeVariable (a:Variable) typeAccu = 
     match a with
@@ -116,4 +120,5 @@ and checkTypeProg (a:Prog) =
     | Program(x) -> let s = checkTypeStatements x []
                     in match s with 
                        | (_, TypeVoid, s) -> TypedProgram(s)
-                       | _ -> raise(TypeError("Program must be of type void"))
+                       | (_, TypeInt, s) -> TypedProgram(s)
+                       | _ -> raise(TypeError("Program must be of type int or void"))

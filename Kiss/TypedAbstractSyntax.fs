@@ -24,7 +24,7 @@ and TypedExpression =
 | TypedAdd of TypedExpression * TypedExpression
 | TypedNew of TypedProperty list
 | TypedUse of string
-| TypedCall of string
+| TypedCall of TypedVariable
 | TypedFun of string list * TypedStatement list
 | TypedGet of TypedVariable
 | TypedGreater of TypedExpression * TypedExpression
