@@ -5,10 +5,8 @@ type TypeName =
 | TypeInt
 | TypeFloat
 | TypeVoid
+| TypeGeneric of string
 | TypeFunc of TypeName List * TypeName
-
-//type TypeResultat<'a> =
-//| TypeRes of TypeName * 'a
 
 type TypedProg = TypedProgram of TypedStatement list
 

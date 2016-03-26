@@ -31,9 +31,12 @@
         | Property(v, p) -> Property(closureVariable v variables, p)
     and closureExpression e variables = 
         match e with
+        | Int(i) -> Int(i)
+        | Float(f) -> Float(f)
         | Get(v) -> Get(closureVariable v variables)
         | Fun(p, ss) -> Fun(p, closureStatements ss variables)
-        | e -> e
+        | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
+
     and closureStatement s variables = 
         match s with
         | Create(name, e) -> let e = closureExpression e variables

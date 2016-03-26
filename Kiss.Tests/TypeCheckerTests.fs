@@ -142,11 +142,10 @@
             Assign(Variable("variableName"), Fun([], [Return(Float(2.0))]))
         ] |> expectedTypeError "Variable is not of type func() : float"
 
-    [<Fact(Skip="WIP")>] 
+    [<Fact>] 
     let ``Should type is correct when check func add``() = 
         [
-            Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]));
-            Assign(Variable("variableName"), Fun([], [Return(Int(2))]))
+            Create("variableName", Fun(["x"; "y"], [Return(Add(Get(Variable("x")), Get(Variable("y"))))]))
         ] |> expectedCorrect [
-            TypedCreate(TypeFunc([], TypeVoid), "variableName", TypedFun([], []));
+            TypedCreate(TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), "variableName", TypedFun([], []));
         ]

@@ -19,6 +19,7 @@ let rec typeToString t =
     | TypeVoid -> "()"
     | Type(name, _) -> name
     | TypeFunc(parameters, returnType) -> "func(" + (parameters |> List.map typeToString |> String.concat ",") + ") : " + (typeToString returnType)
+    | TypeGeneric(t) -> t
 
 let rec getType typeAccu name = 
     match typeAccu with
@@ -43,6 +44,13 @@ let compareType type1 type2 =
        else
           raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
 
+let addGenericParameters typeAccu parameters =
+    let rec addGenericParameters typeAccu parameters count =
+        match parameters with
+        | [] -> typeAccu
+        | a::l -> (a, TypeGeneric("T" + count.ToString()))::(addGenericParameters typeAccu l (count + 1))
+    in addGenericParameters typeAccu parameters 1
+
 let rec checkTypeProperties properties typeAccu=
     match properties with
     | [] -> ([], [])
@@ -59,8 +67,8 @@ and checkTypeExpression (a:Expression) typeAccu =
     | Add(ex1, ex2) -> compareType 
                             (checkTypeExpression ex1 typeAccu)
                             (checkTypeExpression ex2 typeAccu)
-    | Fun(parameters, statements) -> let returnStatementType = (checkTypeStatements statements [] [])
-                                     let (ty, statements) = returnStatementType 
+    | Fun(parameters, statements) -> let typeAccuWithParameters = addGenericParameters typeAccu parameters
+                                     let (ty, statements) = (checkTypeStatements statements typeAccuWithParameters [])
                                      in (TypeFunc([], ty), TypedFun([], statements))
     | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu []
                        in (variableType, TypedGet(variable))
