@@ -14,6 +14,7 @@ let rec typeToString t =
     match t with
     | TypeInt -> "int"
     | TypeFloat -> "float"
+    | TypeBool -> "bool"
     | TypeVoid -> "()"
     | Type(name, _) -> name
     | TypeFunc(parameters, returnType) -> "func(" + (parameters |> List.map typeToString |> String.concat ",") + ") : " + (typeToString returnType)
@@ -49,6 +50,18 @@ let compareType typeAccu type1 type2 =
     | (type1, TypeGeneric(tg2)) -> (replaceType typeAccu tg2 type1, type1, TypedAdd(t1, t2))
     | (type1, type2) -> if type1 = type2 then
                           (typeAccu, type1, TypedAdd(t1, t2))
+                        else
+                          raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
+
+let compareTypeCondition typeAccu type1 type2 R= 
+    let (typeAccu, type1, t1) = type1 
+    let (typeAccu, type2, t2) = type2 
+    match (type1, type2) with
+    | (TypeGeneric(tg1), TypeGeneric(tg2)) -> (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeBool, R(t1, t2))
+    | (TypeGeneric(tg1), type2) -> (replaceType typeAccu tg1 type2, TypeBool, R(t1, t2))
+    | (type1, TypeGeneric(tg2)) -> (replaceType typeAccu tg2 type1, TypeBool, R(t1, t2))
+    | (type1, type2) -> if type1 = type2 then
+                          (typeAccu, TypeBool, R(t1, t2))
                         else
                           raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
 
@@ -96,6 +109,26 @@ and checkTypeExpression (a:Expression) typeAccu =
                         | TypeFunc(_, returnType) -> (typeAccu, returnType, TypedCall(variable))
                         | _ -> raise(TypeError("Variable must be of type Fun()"))
     | Use(name) -> (typeAccu, checkTypeUse name, TypedUse(name))
+    | Greater(ex1, ex2) -> compareTypeCondition
+                            typeAccu
+                            (checkTypeExpression ex1 typeAccu)
+                            (checkTypeExpression ex2 typeAccu)
+                            TypedGreater
+    | GreaterOrEqual(ex1, ex2) -> compareTypeCondition
+                                    typeAccu
+                                    (checkTypeExpression ex1 typeAccu)
+                                    (checkTypeExpression ex2 typeAccu)
+                                    TypedGreaterOrEqual
+    | Less(ex1, ex2) -> compareTypeCondition
+                            typeAccu
+                            (checkTypeExpression ex1 typeAccu)
+                            (checkTypeExpression ex2 typeAccu)
+                            TypedLess
+    | LessOrEqual(ex1, ex2) -> compareTypeCondition
+                                typeAccu
+                                (checkTypeExpression ex1 typeAccu)
+                                (checkTypeExpression ex2 typeAccu)
+                                TypedLessOrEqual
 
 and checkTypeVariable (a:Variable) typeAccu = 
     match a with

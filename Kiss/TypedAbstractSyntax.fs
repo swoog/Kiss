@@ -4,6 +4,7 @@ type TypeName =
 | Type of string * (string * TypeName) list
 | TypeInt
 | TypeFloat
+| TypeBool
 | TypeVoid
 | TypeGeneric of string
 | TypeFunc of TypeName List * TypeName

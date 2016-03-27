@@ -171,6 +171,38 @@
             Create("variableName2", Get(Variable("x")))
         ] |> expectedTypeError "Error to search type of variable x"
 
+    let equalities : obj array seq = 
+        seq { 
+            yield [| Greater; TypedGreater |] 
+            yield [| GreaterOrEqual; TypedGreaterOrEqual |] 
+            yield [| Less; TypedLess |] 
+            yield [| LessOrEqual; TypedLessOrEqual |] 
+        }
+
+    [<Theory>]
+    [<MemberDataAttribute("equalities")>]
+    let ``Should type is correct when check func and comparaison expression``(F:(Expression * Expression -> Expression), TF:(TypedExpression * TypedExpression -> TypedExpression)) = 
+        [
+            Create("f", Fun(["x"; "y"], [Return(F(Get(Variable("x")), Get(Variable("y"))))]))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeBool), 
+                "f", 
+                TypedFun(["x";"y"], [TypedReturn(TF(TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y"))))]));
+        ]
+
+    [<Theory>]
+    [<MemberDataAttribute("equalities")>]
+    let ``Should type is correct when check func and comparaison expression with int``(F:(Expression * Expression -> Expression), TF:(TypedExpression * TypedExpression -> TypedExpression)) = 
+        [
+            Create("f", Fun(["x"], [Return(F(Get(Variable("x")), Int(1)))]))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeInt], TypeBool), 
+                "f", 
+                TypedFun(["x"], [TypedReturn(TF(TypedGet(TypedVariable("x")),TypedInt(1)))]));
+        ]
+
     [<Fact>] 
     let ``Should type is correct when check call of func``() = 
         [
