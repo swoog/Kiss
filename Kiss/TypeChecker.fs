@@ -3,10 +3,20 @@ open AbstractSyntax
 open TypedAbstractSyntax
 
 let mutable counter = 0
+let mutable counterGeneric = 0
+let mutable counterInterface = 0
 
-let newName = 
+let newName = fun() ->
     counter <- counter + 1
     "obj-" + counter.ToString()
+
+let mutable newGenericName = fun() ->
+    counterGeneric <- counterGeneric + 1
+    "T" + counterGeneric.ToString()
+
+let newInterfaceName = fun() ->
+    counterInterface <- counterInterface + 1
+    "I" + counterInterface.ToString()
 
 exception TypeError of string
 
@@ -17,6 +27,7 @@ let rec typeToString t =
     | TypeBool -> "bool"
     | TypeVoid -> "()"
     | Type(name, _) -> name
+    | TypeInterface(name, _) -> name
     | TypeFunc(parameters, returnType) -> "func(" + (parameters |> List.map typeToString |> String.concat ",") + ") : " + (typeToString returnType)
     | TypeGeneric(t) -> t
 
@@ -32,18 +43,28 @@ let rec getPropertyTypeFromProperties properties propertyName =
 
 let getPropertyType objectType propertyName = 
     match objectType with
-    | Type(name, properties) -> getPropertyTypeFromProperties properties propertyName
+    | TypeGeneric(name) -> let t = TypeGeneric(newGenericName())
+                            in (name, TypeInterface(newInterfaceName(), [(propertyName, t)]), t)
+    | Type(name, properties) -> ("", objectType, getPropertyTypeFromProperties properties propertyName)
     | _ -> raise(TypeError((typeToString objectType) + " has no property " + propertyName))
 
-let rec replaceType typeAccu tgName t2 =
+let rec replaceType3 tgName t2 (name, t) = (name, replaceType2 tgName t2 t)
+and replaceType2 tgName t2 t=
+    match t with
+    | TypeGeneric(t) -> if t = tgName then t2 else TypeGeneric(t)
+    | TypeFunc(p, r) -> TypeFunc(List.map (replaceType2 tgName t2) p, replaceType2 tgName t2 r)
+    | Type(name, p) -> Type(name, List.map (replaceType3 tgName t2) p)
+    | TypeInterface(name, p) -> TypeInterface(name, List.map (replaceType3 tgName t2) p)
+    | TypeBool -> TypeBool
+    | TypeInt -> TypeInt
+    | TypeFloat -> TypeFloat
+    | TypeVoid -> TypeVoid
+and replaceType typeAccu tgName t2 =
     match typeAccu with
     | [] -> []
-    | (name, TypeGeneric(t))::l -> (if t = tgName then (name, t2) else (name, TypeGeneric(t)))::(replaceType l tgName t2)
-    | a::l -> a::(replaceType l tgName t2)
+    | (name, t)::l -> (name, replaceType2 tgName t2 t)::(replaceType l tgName t2)
 
-let compareType typeAccu type1 type2 = 
-    let (typeAccu, type1, t1) = type1 
-    let (typeAccu, type2, t2) = type2 
+let compareType typeAccu type1 t1 type2 t2= 
     match (type1, type2) with
     | (TypeGeneric(tg1), TypeGeneric(tg2)) -> (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeGeneric(tg1), TypedAdd(t1, t2))
     | (TypeGeneric(tg1), type2) -> (replaceType typeAccu tg1 type2, type2, TypedAdd(t1, t2))
@@ -65,12 +86,10 @@ let compareTypeCondition typeAccu type1 type2 R=
                         else
                           raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
 
-let addGenericParameters typeAccu parameters =
-    let rec addGenericParameters typeAccu parameters count =
-        match parameters with
-        | [] -> typeAccu
-        | a::l -> (a, TypeGeneric("T" + count.ToString()))::(addGenericParameters typeAccu l (count + 1))
-    in addGenericParameters typeAccu parameters 1
+let rec addGenericParameters typeAccu parameters =
+    match parameters with
+    | [] -> typeAccu
+    | a::l -> (a, TypeGeneric(newGenericName()))::(addGenericParameters typeAccu l)
 
 let checkTypeUse name = 
     match name with
@@ -93,18 +112,17 @@ and checkTypeExpression (a:Expression) typeAccu =
     | Int(i) -> (typeAccu, TypeInt, TypedInt(i))
     | Float(f) -> (typeAccu, TypeFloat, TypedFloat(f))
     | New(properties) -> let (typeProperties, typedProperties) = (checkTypeProperties properties typeAccu)
-                         in (typeAccu, Type(newName, typeProperties), TypedNew(typedProperties))
-    | Add(ex1, ex2) -> compareType 
-                            typeAccu
-                            (checkTypeExpression ex1 typeAccu)
-                            (checkTypeExpression ex2 typeAccu)
+                         in (typeAccu, Type(newName(), typeProperties), TypedNew(typedProperties))
+    | Add(ex1, ex2) ->  let (typeAccu, type1, t1) = (checkTypeExpression ex1 typeAccu)
+                        let (typeAccu, type2, t2) = (checkTypeExpression ex2 typeAccu)
+                        in compareType typeAccu type1 t1 type2 t2
     | Fun(parameters, statements) -> let typeAccuWithParameters = addGenericParameters typeAccu parameters
                                      let (subTypeAccu, ty, statements) = (checkTypeStatements statements typeAccuWithParameters)
                                      let paramatersTypes = List.map (getType subTypeAccu) parameters
                                      in (typeAccu, TypeFunc(paramatersTypes, ty), TypedFun(parameters, statements))
-    | Get(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
+    | Get(variable) -> let (typeAccu, variableType, variable) = checkTypeVariable variable typeAccu
                        in (typeAccu, variableType, TypedGet(variable))
-    | Call(variable) -> let (variableType, variable) = checkTypeVariable variable typeAccu
+    | Call(variable) -> let (typeAccu, variableType, variable) = checkTypeVariable variable typeAccu
                         match variableType with
                         | TypeFunc(_, returnType) -> (typeAccu, returnType, TypedCall(variable))
                         | _ -> raise(TypeError("Variable must be of type Fun()"))
@@ -132,9 +150,10 @@ and checkTypeExpression (a:Expression) typeAccu =
 
 and checkTypeVariable (a:Variable) typeAccu = 
     match a with
-    | Variable(name) -> ((getType typeAccu name), TypedVariable(name))
-    | Property(variable, propertyName) -> let (objectType, variable) = checkTypeVariable variable typeAccu 
-                                          in (getPropertyType objectType propertyName, TypedProperty(variable, propertyName))
+    | Variable(name) -> (typeAccu, (getType typeAccu name), TypedVariable(name))
+    | Property(variable, propertyName) -> let (typeAccu, objectType, variable) = checkTypeVariable variable typeAccu 
+                                          let (genericTypeName, newObjectType, propertyType) = getPropertyType objectType propertyName
+                                          in (replaceType typeAccu genericTypeName newObjectType, propertyType, TypedProperty(variable, propertyName))
 
 and checkTypeStatement a typeAccu = 
     match a with 
@@ -142,7 +161,7 @@ and checkTypeStatement a typeAccu =
                          let typeAccu = (name, typeExpression)::typeAccu
                          in (typeAccu, TypedCreate(typeExpression, name, t))
     | Assign(variable, e) -> let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu) 
-                             let (variableType, variable) = (checkTypeVariable variable typeAccu)
+                             let (typeAccu, variableType, variable) = (checkTypeVariable variable typeAccu)
                              in if typeExpression = variableType then
                                    (typeAccu, TypedAssign(variable, t))
                                 else

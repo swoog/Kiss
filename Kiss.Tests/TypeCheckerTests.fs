@@ -9,6 +9,9 @@
 
     let expectedTypeError errorMessage lines =
         try
+            TypeChecker.counter <- 0;
+            TypeChecker.counterGeneric <- 0;
+            TypeChecker.counterInterface <- 0;
             checkTypeProg (statement lines) |> ignore
             raise(System.Exception("Expected TypeError received no exception"))
         with
@@ -16,6 +19,9 @@
         | e -> raise(System.Exception("Expected TypeError received " + e.ToString()))
 
     let expectedCorrect expectedLines lines= 
+        TypeChecker.counter <- 0;
+        TypeChecker.counterGeneric <- 0;
+        TypeChecker.counterInterface <- 0;
         let resultats = checkTypeProg (statement lines)
         Assert.Equal(TypedProgram(expectedLines), resultats)
 
@@ -52,14 +58,11 @@
             TypedCreate(Type("obj-1",[]), "variableName", TypedNew([]))
         ]
     [<Fact>] 
-    let ``Should type is correct when check assign variable with object``() = 
+    let ``Should type is incorrect when check assign variable with object``() = 
         [
             Create("variableName", New([]));
             Assign(Variable("variableName"), New([]))
-        ] |> expectedCorrect [
-            TypedCreate(Type("obj-1", []), "variableName", TypedNew([]));
-            TypedAssign(TypedVariable("variableName"), TypedNew([]))
-        ]
+        ] |> expectedTypeError "Variable is not of type obj-2"
 
     [<Fact>] 
     let ``Should type is correct when check assign variable with object initialized with property``() = 
@@ -257,3 +260,20 @@
         [
             Create("variableName", Use("undefinedtype"))
         ] |> expectedTypeError "Use of undefinedtype is not found"
+
+
+    [<Fact>] 
+    let ``Should type is correct when check func with call to a property``() = 
+        [
+            Create("f", Fun(["x"], [ Return(Get(Property(Variable("x"),"P")))]))
+        ] |> expectedCorrect [
+            TypedCreate(TypeFunc([TypeInterface("I1", [("P", TypeGeneric("T2"))])], TypeGeneric("T2")), "f", TypedFun(["x"], [ TypedReturn(TypedGet(TypedProperty(TypedVariable("x"),"P")))]))
+        ]
+
+    [<Fact>] 
+    let ``Should type is correct when check func with call to a property and add one``() = 
+        [
+            Create("f", Fun(["x"], [ Return(Add(Get(Property(Variable("x"),"P")), Int(1)))]))
+        ] |> expectedCorrect [
+            TypedCreate(TypeFunc([TypeInterface("I1", [("P", TypeInt)])], TypeInt), "f", TypedFun(["x"], [ TypedReturn(TypedAdd(TypedGet(TypedProperty(TypedVariable("x"),"P")), TypedInt(1)))]))
+        ]

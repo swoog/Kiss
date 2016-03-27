@@ -2,6 +2,7 @@
 
 type TypeName =
 | Type of string * (string * TypeName) list
+| TypeInterface of string * (string * TypeName) list
 | TypeInt
 | TypeFloat
 | TypeBool
