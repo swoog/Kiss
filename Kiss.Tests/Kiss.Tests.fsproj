@@ -59,6 +59,7 @@
     <Compile Include="ParserTests.fs" />
     <Compile Include="ClosureTests.fs" />
     <Compile Include="TypeCheckerTests.fs" />
+    <Compile Include="ToIlTests.fs" />
     <Content Include="packages.config" />
     <Content Include="App.config" />
   </ItemGroup>
