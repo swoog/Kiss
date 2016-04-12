@@ -8,6 +8,7 @@ open Microsoft.FSharp.Text.Lexing
 open AbstractSyntax
 open TypeChecker
 open Closure
+open ToIl
 
 exception ParsingError of string
 
@@ -22,19 +23,20 @@ let LexParseOfString (code:string)=
     use textReader = new System.IO.StringReader(code)
     LexParseOfTextReader textReader
 
-let LexParse (fileName:string)= 
+let LexParse (fileName:string) (assemblyName:string) = 
     use textReader = new System.IO.StreamReader(fileName)
     textReader 
         |> LexParseOfTextReader
         |> closureProgram
         |> checkTypeProg
-        |> Interpreter.Run
+        |> toIl assemblyName
+        |> buildIl assemblyName
 
 
 [<EntryPoint>]
 let main argv = 
-    let testFile = Path.Combine(__SOURCE_DIRECTORY__, "test.kiss")
-    LexParse testFile
+    let testFile = Path.Combine(__SOURCE_DIRECTORY__, "First.kiss")
+    LexParse testFile "First.exe"
 
     printfn "Press any key to continue..."
     System.Console.ReadLine() |> ignore    

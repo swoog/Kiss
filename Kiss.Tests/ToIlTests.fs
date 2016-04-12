@@ -6,12 +6,11 @@
     open ToIl
 
     let expected expectedIl prog= 
-        let resultats = toIl prog
+        let resultats = toIl "First.exe" prog
         Assert.Equal(expectedIl, resultats)
 
     [<Fact>] 
-    let ``Should type is correct when check create variable``() = 
-        TypedProgram([
-        ]) |> expected [
-            TypedCreate(TypeInt, "variableName", TypedInt(1))
-        ]
+    let ``Should create main method When empty program``() = 
+        TypedProgram([])
+         |> expected (Assembly("First.exe", [Class("Program", [EntryPoint("main", [])])]))
+
