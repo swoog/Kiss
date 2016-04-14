@@ -1,7 +1,7 @@
 ﻿module Closure
     open AbstractSyntax
 
-    exception NotFoundVariable
+    exception NotFoundVariable of string
 
     let rec createVariable name variables = 
         match variables with
@@ -21,7 +21,7 @@
 
     let rec getVariable v variables =
         match variables with
-        | [] -> raise(NotFoundVariable)
+        | [] -> raise(NotFoundVariable("Variable " + v + " was not found"))
         | (oldName, newName)::l -> if oldName = v then
                                      newName
                                    else
@@ -39,7 +39,7 @@
         | Int(i) -> Int(i)
         | Float(f) -> Float(f)
         | Get(v) -> Get(closureVariable v variables)
-        | Fun(p, ss) -> let (variables, newNames) = (createVariables p variables)
+        | Fun(p, ss) -> let (variables, newNames) = (createVariables p [])
                         in Fun(newNames, closureStatements ss variables)
         | Add(e1, e2) -> Add(closureExpression e1 variables, closureExpression e2 variables)
         | Call(v) -> Call(closureVariable v variables)

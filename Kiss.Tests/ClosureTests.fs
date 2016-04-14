@@ -7,13 +7,13 @@
 
     let statement a = Program(a)
 
-    let expectedTypeError errorMessage lines =
+    let expectedNotFound errorMessage lines =
         try
             closureProgram (statement lines) |> ignore
-            raise(System.Exception("Expected TypeError received no exception"))
+            raise(System.Exception("Expected NotFoundVariable received no exception"))
         with
-        | TypeError(x) -> Assert.Equal(errorMessage, x)
-        | e -> raise(System.Exception("Expected TypeError received " + e.ToString()))
+        | NotFoundVariable(x) -> Assert.Equal(errorMessage, x)
+        | e -> raise(System.Exception("Expected NotFoundVariable received " + e.ToString()))
 
     let expectedCorrect expectedLines lines= 
         let resultats = closureProgram (statement lines)
@@ -125,14 +125,22 @@
         ]
 
     [<Fact>] 
-    let ``Should return new name when have two create variable with same name in func``() = 
+    let ``Should throw not found variable when have assign variable in func``() = 
         [
             Create("v", Int(1));
             Create("v", Fun([], [Assign(Variable("v"), Int(2)); Return(Get(Variable("v")))]));
             Assign(Variable("v"), Fun([], []))
+        ] |> expectedNotFound "Variable v was not found"
+
+    [<Fact>] 
+    let ``Should return new name when have two create variable with same name in func``() = 
+        [
+            Create("v", Int(1));
+            Create("v", Fun([], [Create("v", Int(2)); Return(Get(Variable("v")))]));
+            Assign(Variable("v"), Fun([], []))
         ] |> expectedCorrect [
             Create("v", Int(1));
-            Create("v-1", Fun([], [Assign(Variable("v"), Int(2)); Return(Get(Variable("v")))]));
+            Create("v-1", Fun([], [Create("v", Int(2)); Return(Get(Variable("v")))]));
             Assign(Variable("v-1"), Fun([], []))
         ]
 
@@ -140,11 +148,11 @@
     let ``Should return new name when have three create variable with same name in func``() = 
         [
             Create("v", Int(1));
-            Create("v", Fun([], [Create("v", Get(Variable("v")))]));
+            Create("v", Fun([], [Create("v", Int(2))]));
             Assign(Variable("v"), Fun([], []))
         ] |> expectedCorrect [
             Create("v", Int(1));
-            Create("v-1", Fun([], [Create("v-1", Get(Variable("v")))]));
+            Create("v-1", Fun([], [Create("v", Int(2))]));
             Assign(Variable("v-1"), Fun([], []))
         ]
 
@@ -152,11 +160,11 @@
     let ``Should return new name when have three create variable with same name in func and return``() = 
         [
             Create("v", Int(1));
-            Create("v", Fun([], [Assign(Variable("v"), Int(2)); Create("v", Get(Variable("v"))); Return(Get(Variable("v")))]));
+            Create("v", Fun([], [Create("v", Int(2)); Create("v", Get(Variable("v"))); Return(Get(Variable("v")))]));
             Assign(Variable("v"), Fun([], []))
         ] |> expectedCorrect [
             Create("v", Int(1));
-            Create("v-1", Fun([], [Assign(Variable("v"), Int(2)); Create("v-1", Get(Variable("v"))); Return(Get(Variable("v-1")))]));
+            Create("v-1", Fun([], [Create("v", Int(2)); Create("v-1", Get(Variable("v"))); Return(Get(Variable("v-1")))]));
             Assign(Variable("v-1"), Fun([], []))
         ]
 

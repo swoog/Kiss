@@ -12,7 +12,8 @@
         | Method of string * IlInstruction list
         | EntryPoint of string * IlInstruction list
     and IlInstruction = 
-        Nop
+        | Ldc_I4_s of int
+        | Nop
 
     let toIl assemblyName p = Assembly(assemblyName, [Class("Program", [EntryPoint("main", [])])])
 
@@ -48,3 +49,4 @@
     and buildEmitIl e ilGenerator =
         match e with
         | Nop -> ilGenerator.Emit(OpCodes.Nop)
+        | Ldc_I4_s(i) -> ilGenerator.Emit(OpCodes.Ldc_I4_S, i)
