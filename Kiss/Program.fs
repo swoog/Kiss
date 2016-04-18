@@ -9,6 +9,7 @@ open AbstractSyntax
 open TypeChecker
 open Closure
 open ToIl
+open BuildIl
 
 exception ParsingError of string
 
