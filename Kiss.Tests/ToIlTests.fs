@@ -53,7 +53,7 @@
 
     [<Fact>] 
     let ``Should create variable When new type``() = 
-        TypedProgram([TypedCreate(Type("obj-1", []), "v", TypedNew([]))])
+        TypedProgram([TypedCreate(Type("obj-1", []), "v", TypedNew(Type("obj-1", []), []))])
          |> expected 
          (Assembly("First.exe", [Class("Program", [EntryPoint([], [("v", Type("obj-1", []), 0);], "main", [Newobj("obj-1"); Stloc(0); Ret])])]))
 

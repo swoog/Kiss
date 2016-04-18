@@ -55,7 +55,7 @@
         [
             Create("variableName", New([]))
         ] |> expectedCorrect [
-            TypedCreate(Type("obj-1",[]), "variableName", TypedNew([]))
+            TypedCreate(Type("obj-1",[]), "variableName", TypedNew(Type("obj-1", []), []))
         ]
     [<Fact>] 
     let ``Should type is incorrect when check assign variable with object``() = 
@@ -70,7 +70,7 @@
             Create("variableName", New([PropertySetter("Prop1", Int(1))]));
             Assign(Property(Variable("variableName"), "Prop1"), Int(2))
         ] |> expectedCorrect [
-            TypedCreate(Type("obj-1", [("Prop1", TypeInt)]), "variableName", TypedNew([TypedPropertySetter("Prop1", TypedInt(1))]));
+            TypedCreate(Type("obj-1", [("Prop1", TypeInt)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeInt)]), [TypedPropertySetter("Prop1", TypedInt(1))]));
             TypedAssign(TypeInt, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedInt(2))
         ]
 
@@ -80,7 +80,7 @@
             Create("variableName", New([PropertySetter("Prop1", Float(1.0))]));
             Assign(Property(Variable("variableName"), "Prop1"), Float(2.0))
         ] |> expectedCorrect [
-            TypedCreate(Type("obj-1", [("Prop1", TypeFloat)]), "variableName", TypedNew([TypedPropertySetter("Prop1", TypedFloat(1.0))]));
+            TypedCreate(Type("obj-1", [("Prop1", TypeFloat)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeFloat)]), [TypedPropertySetter("Prop1", TypedFloat(1.0))]));
             TypedAssign(TypeFloat, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedFloat(2.0))
         ]
 

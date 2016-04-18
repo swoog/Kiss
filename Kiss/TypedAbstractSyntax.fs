@@ -25,7 +25,7 @@ and TypedExpression =
 | TypedFloat of float
 | TypedBool of bool
 | TypedAdd of TypedExpression * TypedExpression
-| TypedNew of TypedProperty list
+| TypedNew of TypeName * TypedProperty list
 | TypedUse of string
 | TypedCall of TypedVariable
 | TypedFun of string list * TypedStatement list

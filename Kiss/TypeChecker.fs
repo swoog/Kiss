@@ -113,7 +113,8 @@ and checkTypeExpression (a:Expression) typeAccu =
     | Bool(i) -> (typeAccu, TypeBool, TypedBool(i))
     | Float(f) -> (typeAccu, TypeFloat, TypedFloat(f))
     | New(properties) -> let (typeProperties, typedProperties) = (checkTypeProperties properties typeAccu)
-                         in (typeAccu, Type(newName(), typeProperties), TypedNew(typedProperties))
+                         let t = Type(newName(), typeProperties)
+                         in (typeAccu, t, TypedNew(t, typedProperties))
     | Add(ex1, ex2) ->  let (typeAccu, type1, t1) = (checkTypeExpression ex1 typeAccu)
                         let (typeAccu, type2, t2) = (checkTypeExpression ex2 typeAccu)
                         in compareType typeAccu type1 t1 type2 t2

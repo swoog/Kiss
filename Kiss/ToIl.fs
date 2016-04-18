@@ -69,6 +69,7 @@
         match e with
         | TypedInt(i) -> (countVariables, [Ldc_I4(i); Stloc(countVariables)])
         | TypedBool(b) -> let v = if b then 1 else 0 in (countVariables, [Ldc_I4(v); Stloc(countVariables)])
+        | TypedNew(Type(t, p), props) -> (countVariables, [Newobj(t); Stloc(countVariables)])
         | TypedAdd(e1, e2) -> 
             let var1 = countVariables + 1
             let (var, instr1) = (toIlExpression e1 var1)
