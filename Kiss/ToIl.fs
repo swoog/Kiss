@@ -10,7 +10,7 @@
     and IlType =
         Class of string * IlMethod list
     and IlParameter = string * int
-    and IlVariable = string * int
+    and IlVariable = string * TypeName * int
     and IlMethod = 
         | Method of IlParameter list * IlVariable list * string * IlInstruction list
         | EntryPoint of IlParameter list * IlVariable list * string * IlInstruction list
@@ -18,6 +18,7 @@
         | Ldc_I4 of int
         | Stloc of int
         | Ldloc of int
+        | Newobj of string
         | Add
         | Ret
         | Nop
@@ -26,12 +27,12 @@
     let rec findIndex variables name = 
         match variables with
         | [] -> raise(Exception("Error"))
-        | (n, i)::l -> if name = n then i else (findIndex l name)
+        | (n, t, i)::l -> if name = n then i else (findIndex l name)
 
     let rec findLocal locals index = 
         match locals with
         | [] -> raise(Exception("Error"))
-        | (local, i)::l -> if index = i then local else (findLocal l index)
+        | (local, t, i)::l -> if index = i then local else (findLocal l index)
 
 
     let rec toIl assemblyName p =
@@ -43,16 +44,16 @@
         match s with
         | [] -> (variables, [])
         | TypedCreate(t, name, e)::l -> 
-            let variable = (name, i)
+            let variable = (name, t, i)
             let (i2, instrExpression) = toIlExpression e i
-            let v = List.init (i2 - i) (fun i -> ("", i + 1))
+            let v = List.init (i2 - i) (fun i -> ("", t, i + 1))
             let (variables, instructions) = toIlStatements l (i2 + 1) (variable::(List.append v variables))
             in (variables, List.append instrExpression instructions)
-        | TypedAssign(t, e)::l -> 
+        | TypedAssign(t, name, e)::l -> 
             let (i2, instrExpression) = toIlExpression e i
             let (variables, instructions) = toIlStatements l (i2 + 1) variables
-            let (variables, getVariableInstr, variableToSet) = toIlVariable t variables
-            let variables = List.append variables [("", i)]
+            let (variables, getVariableInstr, variableToSet) = toIlVariable name variables
+            let variables = List.append variables [("", t, i)]
             let i3 = List.append getVariableInstr instrExpression
             let i = List.append i3 (Ldloc(i)::variableToSet)
             in (variables, List.append i instructions)
@@ -67,6 +68,7 @@
     and toIlExpression e countVariables = 
         match e with
         | TypedInt(i) -> (countVariables, [Ldc_I4(i); Stloc(countVariables)])
+        | TypedBool(b) -> let v = if b then 1 else 0 in (countVariables, [Ldc_I4(v); Stloc(countVariables)])
         | TypedAdd(e1, e2) -> 
             let var1 = countVariables + 1
             let (var, instr1) = (toIlExpression e1 var1)
@@ -76,7 +78,11 @@
             in (var, (List.append instr [Ldloc(var1); Ldloc(var2); Add ; Stloc(countVariables)]))
         | _ -> (0, [])
 
-    let toType t = typedefof<int>
+    let toType t = 
+        match t with
+        | TypeInt -> typedefof<int>
+        | TypeBool -> typedefof<bool>
+        | _ -> typedefof<int>
 
     let rec buildIl assemblyOutput a = 
         (buildAssembly a:AssemblyBuilder).Save(assemblyOutput, PortableExecutableKinds.Preferred32Bit, ImageFileMachine.I386)
@@ -106,17 +112,19 @@
         | EntryPoint(parameters, variables, name, emits) -> 
             let methodBuilder = typeBuilder.DefineMethod(name, MethodAttributes.Static ||| MethodAttributes.Public ||| MethodAttributes.HideBySig ||| MethodAttributes.NewSlot)
             let ilGenerator = methodBuilder.GetILGenerator()
-            let locals = List.map (fun (t, index) -> (ilGenerator.DeclareLocal(toType t), index)) variables 
+            let locals = List.map (fun (_, t, index) -> (ilGenerator.DeclareLocal(toType t), t, index)) variables 
             in buildEmitsIl emits ilGenerator locals;assemblyBuilder.SetEntryPoint(methodBuilder)
     and buildEmitsIl e ilGenerator locals =
         match e with
         | [] -> ()
-        | i::l -> buildEmitIl i ilGenerator locals; buildEmitsIl l ilGenerator locals
-    and buildEmitIl e ilGenerator locals =
+        | i::l -> buildEmitIl i ilGenerator locals []; buildEmitsIl l ilGenerator locals
+    and buildEmitIl e ilGenerator locals classes =
         match e with
         | Nop -> ilGenerator.Emit(OpCodes.Nop)
         | Ldc_I4(i) -> ilGenerator.Emit(OpCodes.Ldc_I4, i)
         | Stloc(index) -> ilGenerator.Emit(OpCodes.Stloc, ((findLocal locals index):LocalBuilder))
         | Ldloc(index) -> ilGenerator.Emit(OpCodes.Ldloc, ((findLocal locals index):LocalBuilder))
+        | Newobj(name) -> ilGenerator.Emit(OpCodes.Newobj, ((findTypeConstructor classes name):TypeBuilder))
         | Add -> ilGenerator.Emit(OpCodes.Add)
         | Ret -> ilGenerator.Emit(OpCodes.Ret)
+    and findTypeConstructor classes name = null

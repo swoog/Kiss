@@ -37,6 +37,7 @@
     and closureExpression e variables = 
         match e with
         | Int(i) -> Int(i)
+        | Bool(b) -> Bool(b)
         | Float(f) -> Float(f)
         | Get(v) -> Get(closureVariable v variables)
         | Fun(p, ss) -> let (variables, newNames) = (createVariables p [])

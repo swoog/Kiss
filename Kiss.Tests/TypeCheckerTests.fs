@@ -71,7 +71,7 @@
             Assign(Property(Variable("variableName"), "Prop1"), Int(2))
         ] |> expectedCorrect [
             TypedCreate(Type("obj-1", [("Prop1", TypeInt)]), "variableName", TypedNew([TypedPropertySetter("Prop1", TypedInt(1))]));
-            TypedAssign(TypedProperty(TypedVariable("variableName"), "Prop1"), TypedInt(2))
+            TypedAssign(TypeInt, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedInt(2))
         ]
 
     [<Fact>] 
@@ -81,7 +81,7 @@
             Assign(Property(Variable("variableName"), "Prop1"), Float(2.0))
         ] |> expectedCorrect [
             TypedCreate(Type("obj-1", [("Prop1", TypeFloat)]), "variableName", TypedNew([TypedPropertySetter("Prop1", TypedFloat(1.0))]));
-            TypedAssign(TypedProperty(TypedVariable("variableName"), "Prop1"), TypedFloat(2.0))
+            TypedAssign(TypeFloat, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedFloat(2.0))
         ]
 
     [<Fact>] 
@@ -135,7 +135,7 @@
             Assign(Variable("variableName"), Fun([], [Return(Int(2))]))
         ] |> expectedCorrect [
             TypedCreate(TypeFunc([], TypeInt), "variableName", TypedFun([], [TypedReturn(TypedInt(1))]));
-            TypedAssign(TypedVariable("variableName"), TypedFun([], [TypedReturn(TypedInt(2))]))
+            TypedAssign(TypeFunc([], TypeInt), TypedVariable("variableName"), TypedFun([], [TypedReturn(TypedInt(2))]))
         ]
 
     [<Fact>] 

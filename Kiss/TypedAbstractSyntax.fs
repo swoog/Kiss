@@ -17,12 +17,13 @@ and TypedStatements =
 
 and TypedStatement = 
 | TypedCreate of TypeName * string * TypedExpression
-| TypedAssign of TypedVariable * TypedExpression
+| TypedAssign of TypeName * TypedVariable * TypedExpression
 | TypedReturn of TypedExpression
 
 and TypedExpression =
 | TypedInt of int
 | TypedFloat of float
+| TypedBool of bool
 | TypedAdd of TypedExpression * TypedExpression
 | TypedNew of TypedProperty list
 | TypedUse of string

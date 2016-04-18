@@ -27,6 +27,8 @@ type token =
   | RPAREN
   | LBRACE
   | RBRACE
+  | TRUE
+  | FALSE
   | INT of (int)
   | NAME of (string)
 type tokenId = 
@@ -56,6 +58,8 @@ type tokenId =
     | TOKEN_RPAREN
     | TOKEN_LBRACE
     | TOKEN_RBRACE
+    | TOKEN_TRUE
+    | TOKEN_FALSE
     | TOKEN_INT
     | TOKEN_NAME
     | TOKEN_end_of_input

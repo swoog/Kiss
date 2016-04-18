@@ -110,6 +110,7 @@ let rec checkTypeProperties properties typeAccu=
 and checkTypeExpression (a:Expression) typeAccu = 
     match a with
     | Int(i) -> (typeAccu, TypeInt, TypedInt(i))
+    | Bool(i) -> (typeAccu, TypeBool, TypedBool(i))
     | Float(f) -> (typeAccu, TypeFloat, TypedFloat(f))
     | New(properties) -> let (typeProperties, typedProperties) = (checkTypeProperties properties typeAccu)
                          in (typeAccu, Type(newName(), typeProperties), TypedNew(typedProperties))
@@ -163,7 +164,7 @@ and checkTypeStatement a typeAccu =
     | Assign(variable, e) -> let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu) 
                              let (typeAccu, variableType, variable) = (checkTypeVariable variable typeAccu)
                              in if typeExpression = variableType then
-                                   (typeAccu, TypedAssign(variable, t))
+                                   (typeAccu, TypedAssign(typeExpression, variable, t))
                                 else
                                    raise(TypeError("Variable is not of type " + (typeToString typeExpression)))
     | Return(_) -> raise(TypeError("check statement incorrect"))

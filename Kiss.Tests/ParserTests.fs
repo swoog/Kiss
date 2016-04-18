@@ -11,6 +11,20 @@
         Assert.Equal(expected, abstractsyntax)
 
     [<Fact>] 
+    let ``Should parse one statement create variable when initialized by constant true``() = 
+        let line = "var variableName = true;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = Program([Create("variableName", Bool(true))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>] 
+    let ``Should parse one statement create variable when initialized by constant false``() = 
+        let line = "var variableName = false;"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = Program([Create("variableName", Bool(false))])
+        Assert.Equal(expected, abstractsyntax)
+
+    [<Fact>] 
     let ``Should parse two statements when assign new value``() = 
         let line = "var variableName = 1;\nvariableName = 2;"
         let abstractsyntax = Program.LexParseOfString line

@@ -5,6 +5,7 @@ open AbstractSyntax
 %start start
 %token <string> NAME
 %token <int> INT
+%token TRUE FALSE
 %token LBRACE RBRACE
 %token LPAREN RPAREN
 %token PLUS MINUS
@@ -38,6 +39,8 @@ Parameters: NAME                                                           { [$1
 
 Expression: Variable LPAREN RPAREN                                         { Call($1) }
           | Variable                                                       { Get($1) }
+          | TRUE                                                           { Bool(true) }
+          | FALSE                                                          { Bool(false) }
           | INT                                                            { Int($1) }
           | LBRACE RBRACE                                                  { New([]) }
           | LBRACE PropertiesInitializer RBRACE                            { New(List.rev($2)) }

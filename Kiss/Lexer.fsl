@@ -18,6 +18,8 @@ let newline = ('\n' | '\r' '\n')
 rule token = parse
 | whitespace                                          { token lexbuf }
 | newline                                             { newline lexbuf; token lexbuf }
+| "true"                                              { TRUE }
+| "false"                                             { FALSE }
 | "var"                                               { VAR }
 | "return"                                            { RETURN }
 | "if"                                                { IF }

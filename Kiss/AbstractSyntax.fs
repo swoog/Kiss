@@ -9,6 +9,7 @@ and Statement =
 
 and Expression =
 | Int of int
+| Bool of bool
 | Float of float
 | Add of Expression * Expression
 | New of Property list
