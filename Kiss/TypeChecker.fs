@@ -66,11 +66,11 @@ and replaceType typeAccu tgName t2 =
 
 let compareType typeAccu type1 t1 type2 t2= 
     match (type1, type2) with
-    | (TypeGeneric(tg1), TypeGeneric(tg2)) -> (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeGeneric(tg1), TypedAdd(t1, t2))
-    | (TypeGeneric(tg1), type2) -> (replaceType typeAccu tg1 type2, type2, TypedAdd(t1, t2))
-    | (type1, TypeGeneric(tg2)) -> (replaceType typeAccu tg2 type1, type1, TypedAdd(t1, t2))
+    | (TypeGeneric(tg1), TypeGeneric(tg2)) -> (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeGeneric(tg1), TypedAdd(TypeGeneric(tg1), t1, t2))
+    | (TypeGeneric(tg1), type2) -> (replaceType typeAccu tg1 type2, type2, TypedAdd(type2, t1, t2))
+    | (type1, TypeGeneric(tg2)) -> (replaceType typeAccu tg2 type1, type1, TypedAdd(type1, t1, t2))
     | (type1, type2) -> if type1 = type2 then
-                          (typeAccu, type1, TypedAdd(t1, t2))
+                          (typeAccu, type1, TypedAdd(type1, t1, t2))
                         else
                           raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
 
@@ -105,7 +105,7 @@ let rec checkTypeProperties properties typeAccu=
     | [] -> ([], [])
     | PropertySetter(name, e)::l -> let (typeAccu, typeExpression, typedExpression) = (checkTypeExpression e typeAccu)
                                     let (typeProperties, typedProperties) = (checkTypeProperties l typeAccu)
-                                    in ((name, typeExpression)::typeProperties, TypedPropertySetter(name, typedExpression)::typedProperties)
+                                    in ((name, typeExpression)::typeProperties, TypedPropertySetter(typeExpression, name, typedExpression)::typedProperties)
 
 and checkTypeExpression (a:Expression) typeAccu = 
     match a with

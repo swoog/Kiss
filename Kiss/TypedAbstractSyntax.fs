@@ -24,7 +24,7 @@ and TypedExpression =
 | TypedInt of int
 | TypedFloat of float
 | TypedBool of bool
-| TypedAdd of TypedExpression * TypedExpression
+| TypedAdd of TypeName * TypedExpression * TypedExpression
 | TypedNew of TypeName * TypedProperty list
 | TypedUse of string
 | TypedCall of TypedVariable
@@ -36,7 +36,7 @@ and TypedExpression =
 | TypedLessOrEqual of TypedExpression * TypedExpression
 
 and TypedProperty = 
-| TypedPropertySetter of string * TypedExpression
+| TypedPropertySetter of TypeName * string * TypedExpression
 
 and TypedVariable = 
 | TypedVariable of string

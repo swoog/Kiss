@@ -70,7 +70,7 @@
             Create("variableName", New([PropertySetter("Prop1", Int(1))]));
             Assign(Property(Variable("variableName"), "Prop1"), Int(2))
         ] |> expectedCorrect [
-            TypedCreate(Type("obj-1", [("Prop1", TypeInt)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeInt)]), [TypedPropertySetter("Prop1", TypedInt(1))]));
+            TypedCreate(Type("obj-1", [("Prop1", TypeInt)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeInt)]), [TypedPropertySetter(TypeInt, "Prop1", TypedInt(1))]));
             TypedAssign(TypeInt, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedInt(2))
         ]
 
@@ -80,7 +80,7 @@
             Create("variableName", New([PropertySetter("Prop1", Float(1.0))]));
             Assign(Property(Variable("variableName"), "Prop1"), Float(2.0))
         ] |> expectedCorrect [
-            TypedCreate(Type("obj-1", [("Prop1", TypeFloat)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeFloat)]), [TypedPropertySetter("Prop1", TypedFloat(1.0))]));
+            TypedCreate(Type("obj-1", [("Prop1", TypeFloat)]), "variableName", TypedNew(Type("obj-1", [("Prop1", TypeFloat)]), [TypedPropertySetter(TypeFloat, "Prop1", TypedFloat(1.0))]));
             TypedAssign(TypeFloat, TypedProperty(TypedVariable("variableName"), "Prop1"), TypedFloat(2.0))
         ]
 
@@ -103,7 +103,7 @@
         [
             Create("variableName", Add(Int(1), Int(2)));
         ] |> expectedCorrect [
-            TypedCreate(TypeInt, "variableName", TypedAdd(TypedInt(1), TypedInt(2)));
+            TypedCreate(TypeInt, "variableName", TypedAdd(TypeInt, TypedInt(1), TypedInt(2)));
         ]
 
     [<Fact>] 
@@ -153,7 +153,7 @@
             TypedCreate(
                 TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), 
                 "variableName", 
-                TypedFun(["x";"y"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y"))))]));
+                TypedFun(["x";"y"], [TypedReturn(TypedAdd(TypeGeneric("T1"), TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y"))))]));
         ]
 
     [<Fact>] 
@@ -164,7 +164,7 @@
             TypedCreate(
                 TypeFunc([TypeInt], TypeInt), 
                 "variableName", 
-                TypedFun(["x"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedInt(1)))]));
+                TypedFun(["x"], [TypedReturn(TypedAdd(TypeInt, TypedGet(TypedVariable("x")),TypedInt(1)))]));
         ]
 
     [<Fact>] 
@@ -215,7 +215,7 @@
             TypedCreate(
                 TypeFunc([TypeInt], TypeInt), 
                 "variableName", 
-                TypedFun(["x"], [TypedReturn(TypedAdd(TypedGet(TypedVariable("x")),TypedInt(1)))]));
+                TypedFun(["x"], [TypedReturn(TypedAdd(TypeInt, TypedGet(TypedVariable("x")),TypedInt(1)))]));
             TypedCreate(TypeInt, "result", TypedCall(TypedVariable("variableName")))
         ]
 
@@ -275,5 +275,5 @@
         [
             Create("f", Fun(["x"], [ Return(Add(Get(Property(Variable("x"),"P")), Int(1)))]))
         ] |> expectedCorrect [
-            TypedCreate(TypeFunc([TypeInterface("I1", [("P", TypeInt)])], TypeInt), "f", TypedFun(["x"], [ TypedReturn(TypedAdd(TypedGet(TypedProperty(TypedVariable("x"),"P")), TypedInt(1)))]))
+            TypedCreate(TypeFunc([TypeInterface("I1", [("P", TypeInt)])], TypeInt), "f", TypedFun(["x"], [ TypedReturn(TypedAdd(TypeInt, TypedGet(TypedProperty(TypedVariable("x"),"P")), TypedInt(1)))]))
         ]

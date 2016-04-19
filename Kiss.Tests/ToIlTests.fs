@@ -35,7 +35,7 @@
 
     [<Fact>] 
     let ``Should create add instruction When add int``() = 
-        TypedProgram([TypedCreate(TypeInt, "myVariable", TypedAdd(TypedInt(1), TypedInt(2)))])
+        TypedProgram([TypedCreate(TypeInt, "myVariable", TypedAdd(TypeInt, TypedInt(1), TypedInt(2)))])
          |> expected 
          (Assembly("First.exe", [Class("Program", [EntryPoint([], [("myVariable", TypeInt, 0); ("", TypeInt, 1); ("", TypeInt, 2)], "main", [Ldc_I4(1); Stloc(1); Ldc_I4(2); Stloc(2); Ldloc(1); Ldloc(2); Add ; Stloc(0); Ret])])]))
 
@@ -47,7 +47,7 @@
 
     [<Fact>] 
     let ``Should assign value when add two int``() = 
-        TypedProgram([TypedCreate(TypeInt, "myVariable", TypedAdd(TypedInt(1), TypedInt(2))); TypedAssign(TypeInt, TypedVariable("myVariable"), TypedInt(4))])
+        TypedProgram([TypedCreate(TypeInt, "myVariable", TypedAdd(TypeInt, TypedInt(1), TypedInt(2))); TypedAssign(TypeInt, TypedVariable("myVariable"), TypedInt(4))])
          |> expected 
          (Assembly("First.exe", [Class("Program", [EntryPoint([], [("myVariable", TypeInt, 0); ("", TypeInt, 1); ("", TypeInt, 2); ("", TypeInt, 3)], "main", [Ldc_I4(1); Stloc(1); Ldc_I4(2); Stloc(2); Ldloc(1); Ldloc(2); Add ; Stloc(0); Ldc_I4(4); Stloc(3); Ldloc(3); Stloc(0); Ret])])]))
 
@@ -59,7 +59,13 @@
 
     [<Fact>] 
     let ``Should create variable When new type and property``() = 
-        TypedProgram([TypedCreate(Type("obj-1", [("prop", TypeInt)]), "v", TypedNew(Type("obj-1", [("prop", TypeInt)]), [TypedPropertySetter("prop",TypedInt(1))]))])
+        TypedProgram([TypedCreate(TypeInt, "v", TypedInt(1)); TypedAssign(TypeInt, TypedVariable("v"), TypedInt(2)); TypedCreate(Type("obj-1", [("prop", TypeInt)]), "v2", TypedNew(Type("obj-1", [("prop", TypeInt)]), [TypedPropertySetter(TypeInt, "prop",TypedInt(3))]))])
          |> expected 
-         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt)]); Class("Program", [EntryPoint([], [("v", Type("obj-1", [("prop", TypeInt)]), 0);("", TypeInt, 1);], "main", [Newobj("obj-1") ; Stloc(0); Ldc_I4(1); Stloc(1); Ldloc(0); Ldloc(1); Stfld("prop"); Ret])])]))
+         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt)]); Class("Program", [EntryPoint([], [("v", TypeInt, 0);("", TypeInt, 1);("v2", Type("obj-1", [("prop", TypeInt)]), 2);("", TypeInt, 3);], "main", [Ldc_I4(1); Stloc(0); Ldc_I4(2); Stloc(1); Ldloc(1); Stloc(0); Newobj("obj-1") ; Stloc(2); Ldc_I4(3); Stloc(3); Ldloc(2); Ldloc(3); Stfld("obj-1", "prop"); Ret])])]))
+
+//    [<Fact>] 
+//    let ``Should create variable When new type and assign two property``() = 
+//        TypedProgram([TypedCreate(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), "v", TypedNew(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), [TypedPropertySetter(TypeInt, "prop",TypedInt(1));TypedPropertySetter(TypeFloat, "prop2",TypedFloat(1.0))]))])
+//         |> expected 
+//         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt);Field("prop2", TypeFloat)]); Class("Program", [EntryPoint([], [("v", Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), 0);("", TypeInt, 1);("", TypeFloat, 2);], "main", [Newobj("obj-1") ; Stloc(0); Ldc_I4(1); Stloc(1); Ldloc(0); Ldloc(1); Stfld("obj-1", "prop"); Ldc_I4(2); Stloc(2); Ldloc(0); Ldloc(2); Stfld("obj-1", "prop2"); Ret])])]))
 
