@@ -4,4 +4,4 @@ i=5;
 i=6;
 var b = true;
 b = false;
-var t = {};
+var t = {p=1};

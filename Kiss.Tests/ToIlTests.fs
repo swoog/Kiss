@@ -57,3 +57,9 @@
          |> expected 
          (Assembly("First.exe", [Class("obj-1", []); Class("Program", [EntryPoint([], [("v", Type("obj-1", []), 0);], "main", [Newobj("obj-1"); Stloc(0); Ret])])]))
 
+    [<Fact>] 
+    let ``Should create variable When new type and property``() = 
+        TypedProgram([TypedCreate(Type("obj-1", [("prop", TypeInt)]), "v", TypedNew(Type("obj-1", [("prop", TypeInt)]), [TypedPropertySetter("prop",TypedInt(1))]))])
+         |> expected 
+         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt)]); Class("Program", [EntryPoint([], [("v", Type("obj-1", [("prop", TypeInt)]), 0);("", TypeInt, 1);], "main", [Newobj("obj-1") ; Stloc(0); Ldc_I4(1); Stloc(1); Ldloc(0); Ldloc(1); Stfld("prop"); Ret])])]))
+
