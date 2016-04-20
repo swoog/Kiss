@@ -78,6 +78,7 @@
     <Compile Include="Closure.fs" />
     <Compile Include="TypeChecker.fs" />
     <Compile Include="ToIl.fs" />
+    <Compile Include="IlOptimizer.fs" />
     <Compile Include="BuildIl.fs" />
     <Compile Include="Program.fs" />
     <None Include="Test.kiss">

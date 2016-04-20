@@ -9,6 +9,7 @@ open AbstractSyntax
 open TypeChecker
 open Closure
 open ToIl
+open IlOptimizer
 open BuildIl
 
 exception ParsingError of string
@@ -32,6 +33,7 @@ let LexParse (fileName:string) (assemblyName:string) =
         |> closureProgram
         |> checkTypeProg
         |> toIl assemblyName
+        |> optimize
         |> buildIl assemblyName
 
 
