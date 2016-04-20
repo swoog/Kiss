@@ -63,9 +63,9 @@
          |> expected 
          (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt)]); Class("Program", [EntryPoint([], [("v", TypeInt, 0);("", TypeInt, 1);("v2", Type("obj-1", [("prop", TypeInt)]), 2);("", TypeInt, 3);], "main", [Ldc_I4(1); Stloc(0); Ldc_I4(2); Stloc(1); Ldloc(1); Stloc(0); Newobj("obj-1") ; Stloc(2); Ldc_I4(3); Stloc(3); Ldloc(2); Ldloc(3); Stfld("obj-1", "prop"); Ret])])]))
 
-//    [<Fact>] 
-//    let ``Should create variable When new type and assign two property``() = 
-//        TypedProgram([TypedCreate(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), "v", TypedNew(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), [TypedPropertySetter(TypeInt, "prop",TypedInt(1));TypedPropertySetter(TypeFloat, "prop2",TypedFloat(1.0))]))])
-//         |> expected 
-//         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt);Field("prop2", TypeFloat)]); Class("Program", [EntryPoint([], [("v", Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), 0);("", TypeInt, 1);("", TypeFloat, 2);], "main", [Newobj("obj-1") ; Stloc(0); Ldc_I4(1); Stloc(1); Ldloc(0); Ldloc(1); Stfld("obj-1", "prop"); Ldc_I4(2); Stloc(2); Ldloc(0); Ldloc(2); Stfld("obj-1", "prop2"); Ret])])]))
+    [<Fact>] 
+    let ``Should create variable When new type and assign two property``() = 
+        TypedProgram([TypedCreate(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), "v", TypedNew(Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), [TypedPropertySetter(TypeInt, "prop",TypedInt(1));TypedPropertySetter(TypeFloat, "prop2",TypedFloat(1.0))]))])
+         |> expected 
+         (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt);Field("prop2", TypeFloat)]); Class("Program", [EntryPoint([], [("v", Type("obj-1", [("prop", TypeInt);("prop2", TypeFloat)]), 0);("", TypeInt, 1);("", TypeFloat, 2);], "main", [Newobj("obj-1") ; Stloc(0); Ldc_I4(1); Stloc(1); Ldloc(0); Ldloc(1); Stfld("obj-1", "prop"); Ldc_R4(1.0); Stloc(2); Ldloc(0); Ldloc(2); Stfld("obj-1", "prop2"); Ret])])]))
 

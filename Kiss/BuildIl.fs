@@ -100,6 +100,7 @@ and buildEmitIl e ilGenerator locals classes members =
     match e with
     | Nop -> ilGenerator.Emit(OpCodes.Nop)
     | Ldc_I4(i) -> ilGenerator.Emit(OpCodes.Ldc_I4, i)
+    | Ldc_R4(i) -> ilGenerator.Emit(OpCodes.Ldc_R4, i)
     | Stloc(index) -> ilGenerator.Emit(OpCodes.Stloc, ((findLocal locals index):LocalBuilder))
     | Ldloc(index) -> ilGenerator.Emit(OpCodes.Ldloc, ((findLocal locals index):LocalBuilder))
     | Stfld(className, name) -> ilGenerator.Emit(OpCodes.Stfld, ((findField classes className name):FieldBuilder))

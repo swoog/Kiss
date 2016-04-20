@@ -17,6 +17,7 @@ and IlElement =
     | Field of string * TypeName
 and IlInstruction = 
     | Ldc_I4 of int
+    | Ldc_R4 of float
     | Stloc of int
     | Ldloc of int
     | Stfld  of string * string
@@ -105,6 +106,8 @@ and toIlExpression e variables returnVar =
     match e with
     | TypedInt(i) -> 
         (variables, [Ldc_I4(i); Stloc(returnVar)])
+    | TypedFloat(i) -> 
+        (variables, [Ldc_R4(i); Stloc(returnVar)])
     | TypedBool(b) -> 
         let v = if b then 1 else 0 
         in (variables, [Ldc_I4(v); Stloc(returnVar)])
@@ -128,4 +131,7 @@ and toIlPropertySet props countVariables varObj variables className =
         let var = (List.length variables)
         let variables = List.append variables [("", t, var)]
         let (variables, exp) = toIlExpression e variables var
-        in (variables, List.append exp [Ldloc(varObj); Ldloc(var); Stfld(className, name) ])
+        let instruction = List.append exp [Ldloc(varObj); Ldloc(var); Stfld(className, name) ]
+        let (variables, ins) = (toIlPropertySet l countVariables varObj variables className)
+        let instruction = List.append instruction ins
+        in (variables, instruction)
