@@ -27,7 +27,8 @@ let LexParseOfString (code:string)=
 let LexParse (fileName:string) (assemblyName:string) = 
     use textReader = new System.IO.StreamReader(fileName)
     textReader 
-        |> LexParseOfTextReader
+        |> LexBuffer<char>.FromTextReader
+        |> Parser.start Lexer.token
         |> closureProgram
         |> checkTypeProg
         |> toIl assemblyName
