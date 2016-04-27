@@ -60,6 +60,7 @@
     <Compile Include="ClosureTests.fs" />
     <Compile Include="TypeCheckerTests.fs" />
     <Compile Include="ToIlTests.fs" />
+    <Compile Include="IlOptimizerTests.fs" />
     <Content Include="packages.config" />
     <Content Include="App.config" />
   </ItemGroup>
