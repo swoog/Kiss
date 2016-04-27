@@ -11,6 +11,7 @@ and Expression =
 | Int of int
 | Bool of bool
 | Float of float
+| String of string
 | Add of Expression * Expression
 | New of Property list
 | Use of string

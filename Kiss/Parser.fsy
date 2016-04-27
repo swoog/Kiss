@@ -5,6 +5,7 @@ open AbstractSyntax
 %start start
 %token <string> NAME
 %token <int> INT
+%token <string> STRING
 %token TRUE FALSE
 %token LBRACE RBRACE
 %token LPAREN RPAREN
@@ -13,7 +14,7 @@ open AbstractSyntax
 %token FUN ARROW RETURN
 %token GREATER LESS GREATEREQUAL LESSEQUAL
 %token SEMI COMMA
-%token DESINCR AND DOT EQUAL STRING
+%token DESINCR AND DOT EQUAL
 %token EOF
 %type < AbstractSyntax.Prog > start
 
@@ -42,6 +43,7 @@ Expression: Variable LPAREN RPAREN                                         { Cal
           | TRUE                                                           { Bool(true) }
           | FALSE                                                          { Bool(false) }
           | INT                                                            { Int($1) }
+          | STRING                                                         { String($1) }
           | LBRACE RBRACE                                                  { New([]) }
           | LBRACE PropertiesInitializer RBRACE                            { New(List.rev($2)) }
           | USE LPAREN NAME RPAREN                                         { Use($3) }

@@ -6,7 +6,6 @@ type token =
   | AND
   | DOT
   | EQUAL
-  | STRING
   | SEMI
   | COMMA
   | GREATER
@@ -29,6 +28,7 @@ type token =
   | RBRACE
   | TRUE
   | FALSE
+  | STRING of (string)
   | INT of (int)
   | NAME of (string)
 type tokenId = 
@@ -37,7 +37,6 @@ type tokenId =
     | TOKEN_AND
     | TOKEN_DOT
     | TOKEN_EQUAL
-    | TOKEN_STRING
     | TOKEN_SEMI
     | TOKEN_COMMA
     | TOKEN_GREATER
@@ -60,6 +59,7 @@ type tokenId =
     | TOKEN_RBRACE
     | TOKEN_TRUE
     | TOKEN_FALSE
+    | TOKEN_STRING
     | TOKEN_INT
     | TOKEN_NAME
     | TOKEN_end_of_input

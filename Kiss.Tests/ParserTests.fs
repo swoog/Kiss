@@ -179,4 +179,18 @@
             Program([Return(Call(Property(Variable("c"),"Method")))])
         Assert.Equal(expected, abstractsyntax)
 
+    [<Fact>]
+    let ``Should parse string constante``() = 
+        let line = "var v = \"test of string\";"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", String("test of string"))])
+        Assert.Equal(expected, abstractsyntax)
 
+    [<Fact>]
+    let ``Should parse string constante when have ignore quote``() = 
+        let line = "var v = \"test of string with \\\" charactere\";"
+        let abstractsyntax = Program.LexParseOfString line
+        let expected = 
+            Program([Create("v", String("test of string with \" charactere"))])
+        Assert.Equal(expected, abstractsyntax)

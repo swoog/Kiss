@@ -46,6 +46,12 @@ rule token = parse
 | ";"                                                 { SEMI }
 | ['0'-'9']+                                          { INT(int(lexeme lexbuf)) }
 | ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9']*            { NAME(lexeme lexbuf) }
-| ""                                                  { STRING }
+| ['"']                                               { stringToken "" false lexbuf }
 | _                                                   { failwith ("Parse error on " + LexBuffer<_>.LexemeString lexbuf) }
 | eof                                                 { EOF }
+
+and stringToken str ignorequote = parse
+| '"'           { if ignorequote  then (stringToken (str+"\"") false lexbuf) else STRING (str) } 
+| '\\'          { stringToken str true lexbuf } 
+| [^ '"' '\\']+ { stringToken (str+(lexeme lexbuf)) false lexbuf } 
+| eof           { failwith ("String is not terminated") } 
