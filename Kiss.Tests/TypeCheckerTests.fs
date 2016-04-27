@@ -34,6 +34,14 @@
         ]
 
     [<Fact>] 
+    let ``Should type is correct when check create variable with string type``() = 
+        [
+            Create("variableName", String("my value"))
+        ] |> expectedCorrect [
+            TypedCreate(TypeString, "variableName", TypedString("my value"))
+        ]
+
+    [<Fact>] 
     let ``Should type is incorrect when check create variable and assign``() = 
         [
             Create("variableName", Int(1));

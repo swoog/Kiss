@@ -7,6 +7,7 @@ type TypeName =
 | TypeFloat
 | TypeBool
 | TypeVoid
+| TypeString
 | TypeGeneric of string
 | TypeFunc of TypeName List * TypeName
 
@@ -24,6 +25,7 @@ and TypedExpression =
 | TypedInt of int
 | TypedFloat of float
 | TypedBool of bool
+| TypedString of string
 | TypedAdd of TypeName * TypedExpression * TypedExpression
 | TypedNew of TypeName * TypedProperty list
 | TypedUse of string

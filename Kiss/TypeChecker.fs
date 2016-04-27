@@ -112,6 +112,7 @@ and checkTypeExpression (a:Expression) typeAccu =
     | Int(i) -> (typeAccu, TypeInt, TypedInt(i))
     | Bool(i) -> (typeAccu, TypeBool, TypedBool(i))
     | Float(f) -> (typeAccu, TypeFloat, TypedFloat(f))
+    | String(s) -> (typeAccu, TypeString, TypedString(s))
     | New(properties) -> let (typeProperties, typedProperties) = (checkTypeProperties properties typeAccu)
                          let t = Type(newName(), typeProperties)
                          in (typeAccu, t, TypedNew(t, typedProperties))

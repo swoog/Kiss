@@ -39,6 +39,7 @@
         | Int(i) -> Int(i)
         | Bool(b) -> Bool(b)
         | Float(f) -> Float(f)
+        | String(s) -> String(s)
         | Get(v) -> Get(closureVariable v variables)
         | Fun(p, ss) -> let (variables, newNames) = (createVariables p [])
                         in Fun(newNames, closureStatements ss variables)
