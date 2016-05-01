@@ -165,6 +165,17 @@
         ]
 
     [<Fact>] 
+    let ``Should type is correct when check func add and seconde instruction of type int``() = 
+        [
+            Create("variableName", Fun(["x"; "y"], [Create("z", Add(Get(Variable("x")), Get(Variable("y")))); Return(Add(Get(Variable("z")), Int(1)))]))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), 
+                "variableName", 
+                TypedFun(["x";"y"], [TypedCreate(TypeInt, "z", TypedAdd(TypeInt, TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y")))); TypedReturn(TypedAdd(TypeInt, TypedGet(TypedVariable("z")), TypedInt(1)))]));
+        ]
+
+    [<Fact>] 
     let ``Should type is correct when check func add with int``() = 
         [
             Create("variableName", Fun(["x"], [Return(Add(Get(Variable("x")), Int(1)))]))

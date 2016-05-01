@@ -66,13 +66,17 @@ and replaceType typeAccu tgName t2 =
 
 let compareType typeAccu type1 t1 type2 t2= 
     match (type1, type2) with
-    | (TypeGeneric(tg1), TypeGeneric(tg2)) -> (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeGeneric(tg1), TypedAdd(TypeGeneric(tg1), t1, t2))
-    | (TypeGeneric(tg1), type2) -> (replaceType typeAccu tg1 type2, type2, TypedAdd(type2, t1, t2))
-    | (type1, TypeGeneric(tg2)) -> (replaceType typeAccu tg2 type1, type1, TypedAdd(type1, t1, t2))
-    | (type1, type2) -> if type1 = type2 then
-                          (typeAccu, type1, TypedAdd(type1, t1, t2))
-                        else
-                          raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
+    | (TypeGeneric(tg1), TypeGeneric(tg2)) -> 
+        (replaceType typeAccu tg2 (TypeGeneric(tg1)), TypeGeneric(tg1), TypedAdd(TypeGeneric(tg1), t1, t2))
+    | (TypeGeneric(tg1), type2) -> 
+        (replaceType typeAccu tg1 type2, type2, TypedAdd(type2, t1, t2))
+    | (type1, TypeGeneric(tg2)) -> 
+        (replaceType typeAccu tg2 type1, type1, TypedAdd(type1, t1, t2))
+    | (type1, type2) -> 
+        if type1 = type2 then
+            (typeAccu, type1, TypedAdd(type1, t1, t2))
+         else
+            raise(TypeError("Expression at the left is " + (typeToString type1) + " and the right is " + (typeToString type2)))
 
 let compareTypeCondition typeAccu type1 type2 R= 
     let (typeAccu, type1, t1) = type1 
@@ -116,9 +120,10 @@ and checkTypeExpression (a:Expression) typeAccu =
     | New(properties) -> let (typeProperties, typedProperties) = (checkTypeProperties properties typeAccu)
                          let t = Type(newName(), typeProperties)
                          in (typeAccu, t, TypedNew(t, typedProperties))
-    | Add(ex1, ex2) ->  let (typeAccu, type1, t1) = (checkTypeExpression ex1 typeAccu)
-                        let (typeAccu, type2, t2) = (checkTypeExpression ex2 typeAccu)
-                        in compareType typeAccu type1 t1 type2 t2
+    | Add(ex1, ex2) ->  
+        let (typeAccu, type1, ex1) = (checkTypeExpression ex1 typeAccu)
+        let (typeAccu, type2, ex2) = (checkTypeExpression ex2 typeAccu)
+        in compareType typeAccu type1 ex1 type2 ex2
     | Fun(parameters, statements) -> let typeAccuWithParameters = addGenericParameters typeAccu parameters
                                      let (subTypeAccu, ty, statements) = (checkTypeStatements statements typeAccuWithParameters)
                                      let paramatersTypes = List.map (getType subTypeAccu) parameters
@@ -160,9 +165,10 @@ and checkTypeVariable (a:Variable) typeAccu =
 
 and checkTypeStatement a typeAccu = 
     match a with 
-    | Create(name, e) -> let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu)
-                         let typeAccu = (name, typeExpression)::typeAccu
-                         in (typeAccu, TypedCreate(typeExpression, name, t))
+    | Create(name, e) -> 
+        let (typeAccu, typeExpression, exp) = (checkTypeExpression e typeAccu)
+        let typeAccu = (name, typeExpression)::typeAccu
+        in (typeAccu, TypedCreate(typeExpression, name, exp))
     | Assign(variable, e) -> let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu) 
                              let (typeAccu, variableType, variable) = (checkTypeVariable variable typeAccu)
                              in if typeExpression = variableType then
