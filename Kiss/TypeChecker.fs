@@ -34,7 +34,7 @@ let rec typeToString t =
 let rec getType typeAccu name = 
     match typeAccu with
     | [] -> raise(TypeError("Error to search type of variable " + name))
-    | (variableName, valueType)::l -> if variableName = name then valueType else (getType l name)
+    | (variableName, valueType, valueTypeOriginal)::l -> if variableName = name then valueType else (getType l name)
 
 let rec getPropertyTypeFromProperties properties propertyName =
     match properties with
@@ -62,7 +62,7 @@ and replaceType2 tgName t2 t=
 and replaceType typeAccu tgName t2 =
     match typeAccu with
     | [] -> []
-    | (name, t)::l -> (name, replaceType2 tgName t2 t)::(replaceType l tgName t2)
+    | (name, t, t3)::l -> (name, replaceType2 tgName t2 t, t3)::(replaceType l tgName t2)
 
 let compareType typeAccu type1 t1 type2 t2= 
     match (type1, type2) with
@@ -93,7 +93,9 @@ let compareTypeCondition typeAccu type1 type2 R=
 let rec addGenericParameters typeAccu parameters =
     match parameters with
     | [] -> typeAccu
-    | a::l -> (a, TypeGeneric(newGenericName()))::(addGenericParameters typeAccu l)
+    | a::l -> 
+        let newName = newGenericName()
+        in (a, TypeGeneric(newName), TypeGeneric(newName))::(addGenericParameters typeAccu l)
 
 let checkTypeUse name = 
     match name with
@@ -167,29 +169,73 @@ and checkTypeStatement a typeAccu =
     match a with 
     | Create(name, e) -> 
         let (typeAccu, typeExpression, exp) = (checkTypeExpression e typeAccu)
-        let typeAccu = (name, typeExpression)::typeAccu
+        let typeAccu = (name, typeExpression, typeExpression)::typeAccu
         in (typeAccu, TypedCreate(typeExpression, name, exp))
-    | Assign(variable, e) -> let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu) 
-                             let (typeAccu, variableType, variable) = (checkTypeVariable variable typeAccu)
-                             in if typeExpression = variableType then
-                                   (typeAccu, TypedAssign(typeExpression, variable, t))
-                                else
-                                   raise(TypeError("Variable is not of type " + (typeToString typeExpression)))
+    | Assign(variable, e) -> 
+        let (typeAccu, typeExpression, t) = (checkTypeExpression e typeAccu) 
+        let (typeAccu, variableType, variable) = (checkTypeVariable variable typeAccu)
+        in if typeExpression = variableType then
+            (typeAccu, TypedAssign(typeExpression, variable, t))
+           else
+             raise(TypeError("Variable is not of type " + (typeToString typeExpression)))
     | Return(_) -> raise(TypeError("check statement incorrect"))
 
 and checkTypeStatements (a:Statement list) typeAccu = 
-    match a with
-    | [] -> (typeAccu, TypeVoid, [])
-    | (Return(a))::l -> let (typeAccu, typeExpression, t) = checkTypeExpression a typeAccu
-                        in (typeAccu, typeExpression, [TypedReturn(t)])
-    | a::l -> let (typeAccu, statement) = checkTypeStatement a typeAccu
-              let (typeAccu, t, s) = checkTypeStatements l typeAccu
-              in (typeAccu, t, statement::s)
+    let rec checkTypeStatements2 (a:Statement list) typeAccu res t = 
+        match a with
+        | [] ->
+            let replaceType = List.map (fun (n, t1, t2) -> (t1, t2)) typeAccu
+            in  (typeAccu, t, replaceStatements replaceType (List.rev res))
+        | (Return(a))::l -> 
+            let (typeAccu, typeExpression, t) = checkTypeExpression a typeAccu
+            let v = TypedReturn(t)::res
+            in checkTypeStatements2 l typeAccu v typeExpression
+        | a::l -> 
+            let (typeAccu, statement) = checkTypeStatement a typeAccu
+            let v = statement::res
+            in checkTypeStatements2 l typeAccu v t
+    in checkTypeStatements2 a typeAccu [] TypeVoid
 
 and checkTypeProg (a:Prog) = 
     match a with
     | Program(x) -> let s = checkTypeStatements x []
                     in match s with 
-                       | (_, TypeVoid, s) -> TypedProgram(s)
-                       | (_, TypeInt, s) -> TypedProgram(s)
+                       | (typeAccu, TypeVoid, s) -> (typeAccu, TypedProgram(s))
+                       | (typeAccu, TypeInt, s) -> (typeAccu, TypedProgram(s))
                        | _ -> raise(TypeError("Program must be of type int or void"))
+
+and checkType (a:Prog) =
+    let (typeAccu, t) = checkTypeProg a
+    in t
+and replaceStatements replaceType a =
+    match a with
+    | [] -> []
+    | a::l -> (replaceStatement replaceType a)::(replaceStatements replaceType l)
+and replaceStatement replaceType a =
+    match a with
+    | TypedCreate(t, name, exp) -> TypedCreate(replaceTypes replaceType t, name, replaceExpression replaceType  exp)
+    | TypedAssign(t, variable, exp) -> TypedAssign(replaceTypes replaceType t, variable, replaceExpression replaceType  exp)
+    | TypedReturn(exp) -> TypedReturn(replaceExpression replaceType exp)
+and replaceExpression replaceType a = 
+    match a with
+    | TypedBool(b) -> TypedBool(b)
+    | TypedInt(i) -> TypedInt(i)
+    | TypedFloat(f) -> TypedFloat(f)
+    | TypedString(s) -> TypedString(s)
+    | TypedAdd(t, exp1, exp2)  -> TypedAdd(replaceTypes replaceType t, replaceExpression replaceType exp1,replaceExpression replaceType exp2)
+    | TypedCall(t) -> TypedCall(t)
+    | TypedFun(t, s) -> TypedFun(t, replaceStatements replaceType s)
+    | TypedGet(t) -> TypedGet(t)
+    | TypedGreater(exp1, exp2) -> TypedGreater(replaceExpression replaceType exp1, replaceExpression replaceType exp2)
+    | TypedGreaterOrEqual(exp1, exp2) -> TypedGreaterOrEqual(replaceExpression replaceType exp1, replaceExpression replaceType exp2)
+    | TypedLess(exp1, exp2) -> TypedLess(replaceExpression replaceType exp1, replaceExpression replaceType exp2)
+    | TypedLessOrEqual(exp1, exp2) -> TypedLessOrEqual(replaceExpression replaceType exp1, replaceExpression replaceType exp2)
+    | TypedNew(t, p) -> TypedNew(replaceTypes replaceType t, p)
+    | TypedUse(name) -> TypedUse(name)
+and replaceTypes replaceType t =
+    match replaceType with
+    | [] -> t
+    | (type1, TypeGeneric(name))::l -> 
+        let t = replaceTypes l t
+        in replaceType2 name type1 t
+    | a::l -> replaceTypes l t

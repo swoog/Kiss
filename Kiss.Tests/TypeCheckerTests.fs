@@ -12,7 +12,7 @@
             TypeChecker.counter <- 0;
             TypeChecker.counterGeneric <- 0;
             TypeChecker.counterInterface <- 0;
-            checkTypeProg (statement lines) |> ignore
+            checkType (statement lines) |> ignore
             raise(System.Exception("Expected TypeError received no exception"))
         with
         | TypeError(x) -> Assert.Equal(errorMessage, x)
@@ -22,7 +22,7 @@
         TypeChecker.counter <- 0;
         TypeChecker.counterGeneric <- 0;
         TypeChecker.counterInterface <- 0;
-        let resultats = checkTypeProg (statement lines)
+        let resultats = checkType (statement lines)
         Assert.Equal(TypedProgram(expectedLines), resultats)
 
     [<Fact>] 
@@ -170,7 +170,7 @@
             Create("variableName", Fun(["x"; "y"], [Create("z", Add(Get(Variable("x")), Get(Variable("y")))); Return(Add(Get(Variable("z")), Int(1)))]))
         ] |> expectedCorrect [
             TypedCreate(
-                TypeFunc([TypeGeneric("T1"); TypeGeneric("T1")], TypeGeneric("T1")), 
+                TypeFunc([TypeInt; TypeInt], TypeInt), 
                 "variableName", 
                 TypedFun(["x";"y"], [TypedCreate(TypeInt, "z", TypedAdd(TypeInt, TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y")))); TypedReturn(TypedAdd(TypeInt, TypedGet(TypedVariable("z")), TypedInt(1)))]));
         ]

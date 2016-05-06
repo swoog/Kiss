@@ -31,7 +31,7 @@ let LexParse (fileName:string) (assemblyName:string) =
         |> LexBuffer<char>.FromTextReader
         |> Parser.start Lexer.token
         |> closureProgram
-        |> checkTypeProg
+        |> checkType
         |> toIl assemblyName
         |> optimize
         |> buildIl assemblyName
