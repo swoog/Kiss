@@ -183,6 +183,17 @@
         ]
 
     [<Fact>] 
+    let ``Should type is correct when check func add and seconde instruction of type string``() = 
+        [
+            Create("variableName", Fun(["x"; "y"], [Create("z", Add(Get(Variable("x")), Get(Variable("y")))); Return(Add(Get(Variable("z")), String("Test")))]))
+        ] |> expectedCorrect [
+            TypedCreate(
+                TypeFunc([TypeString; TypeString], TypeString), 
+                "variableName", 
+                TypedFun(["x";"y"], [TypedCreate(TypeString, "z", TypedAdd(TypeString, TypedGet(TypedVariable("x")),TypedGet(TypedVariable("y")))); TypedReturn(TypedAdd(TypeString, TypedGet(TypedVariable("z")), TypedString("Test")))]));
+        ]
+
+    [<Fact>] 
     let ``Should type is correct when check func add with int``() = 
         [
             Create("variableName", Fun(["x"], [Return(Add(Get(Variable("x")), Int(1)))]))

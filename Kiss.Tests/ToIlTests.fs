@@ -14,6 +14,11 @@
         TypedProgram([])
          |> expected (Assembly("First.exe", [Class("Program", [EntryPoint([], [], "main", [Ret])])]))
 
+    [<Fact>] 
+    let ``Should create main method When create string variable``() = 
+        TypedProgram([TypedCreate(TypeString, "myVariable", TypedString("Test"))])
+         |> expected 
+         (Assembly("First.exe", [Class("Program", [EntryPoint([], [("myVariable", TypeString, 0);], "main", [Ldstr("Test"); Stloc(0); Ret])])]))
 
     [<Fact>] 
     let ``Should create main method When create int variable``() = 

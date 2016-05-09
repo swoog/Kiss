@@ -99,6 +99,7 @@ and buildEmitsIl e ilGenerator locals classes members =
 and buildEmitIl e ilGenerator locals classes members =
     match e with
     | Nop -> ilGenerator.Emit(OpCodes.Nop)
+    | Ldstr(s) -> ilGenerator.Emit(OpCodes.Ldstr, s)
     | Ldc_I4(i) -> ilGenerator.Emit(OpCodes.Ldc_I4, i)
     | Ldc_R4(i) -> ilGenerator.Emit(OpCodes.Ldc_R4, i)
     | Stloc(index) -> ilGenerator.Emit(OpCodes.Stloc, ((findLocal locals index):LocalBuilder))

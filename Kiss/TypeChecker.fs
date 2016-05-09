@@ -60,6 +60,7 @@ and replaceType2 tgName t2 t=
     | TypeInt -> TypeInt
     | TypeFloat -> TypeFloat
     | TypeVoid -> TypeVoid
+    | TypeString -> TypeString
 and replaceType typeAccu tgName t2 =
     match typeAccu with
     | [] -> []

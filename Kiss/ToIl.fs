@@ -16,6 +16,7 @@ and IlElement =
     | EntryPoint of IlParameter list * IlVariable list * string * IlInstruction list
     | Field of string * TypeName
 and IlInstruction = 
+    | Ldstr of string
     | Ldc_I4 of int
     | Ldc_R4 of float
     | Stloc of int
@@ -54,6 +55,7 @@ and getTypeObjectProp p = []
 and getTypeObjectExpression e = 
     match e with
     | TypedNew(t, props) -> List.append  (getTypeObjectType t) (getTypeObjectProp props)
+    | TypedString(_) -> []
     | TypedUse(_) -> []
     | TypedInt(_) -> []
     | TypedFloat(_) -> []
@@ -108,6 +110,8 @@ and toIlExpression e variables returnVar =
         (variables, [Ldc_I4(i); Stloc(returnVar)])
     | TypedFloat(i) -> 
         (variables, [Ldc_R4(i); Stloc(returnVar)])
+    | TypedString(s) ->
+        (variables, [Ldstr(s); Stloc(returnVar)])
     | TypedBool(b) -> 
         let v = if b then 1 else 0 
         in (variables, [Ldc_I4(v); Stloc(returnVar)])
