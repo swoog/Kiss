@@ -5,6 +5,8 @@ open System.Reflection
 open System.Reflection.Emit
 open TypedAbstractSyntax
 
+exception IlError of string
+
 type IlAssembly =
     Assembly of string * IlType list
 and IlType =
@@ -119,6 +121,7 @@ and toIlExpression e variables returnVar =
         let variablesIns = [Newobj(t); Stloc(returnVar)]
         let (variables, props) = (toIlPropertySet props returnVar returnVar variables t)
         in (variables, List.append variablesIns props)
+    | TypedNew(t, _) -> raise(IlError("Error to generate IL for type " + (TypeChecker.typeToString t)))
     | TypedAdd(t, e1, e2) -> 
         let var1 = returnVar + 1
         let var2 = returnVar + 2
@@ -127,7 +130,6 @@ and toIlExpression e variables returnVar =
         let (variables, instr2) = (toIlExpression e2 variables var2)
         let instr = List.append instr1 instr2
         in (variables, (List.append instr [Ldloc(var1); Ldloc(var2); Add ; Stloc(returnVar)]))
-    | _ -> ([], [])
 and toIlPropertySet props countVariables varObj variables className =
     match props with
     | [] -> (variables, [])

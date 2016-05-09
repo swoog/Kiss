@@ -9,6 +9,14 @@
         let resultats = toIl "First.exe" prog
         Assert.Equal(expectedIl, resultats)
 
+    let expectedError errorMessage prog =
+        try
+            toIl "First.exe" prog |> ignore
+            raise(System.Exception("Expected IlError received no exception"))
+        with
+        | IlError(x) -> Assert.Equal(errorMessage, x)
+        | e -> raise(System.Exception("Expected IlError received " + e.ToString()))
+
     [<Fact>] 
     let ``Should create main method When empty program``() = 
         TypedProgram([])
@@ -63,9 +71,14 @@
          (Assembly("First.exe", [Class("obj-1", []); Class("Program", [EntryPoint([], [("v", Type("obj-1", []), 0);], "main", [Newobj("obj-1"); Stloc(0); Ret])])]))
 
     [<Fact>] 
+    let ``Should raise error When new type of bool``() = 
+        TypedProgram([TypedCreate(Type("obj-1", []), "v", TypedNew(TypeBool, []))])
+         |> expectedError "Error to generate IL for type bool"
+
+    [<Fact>] 
     let ``Should create variable When new type and property``() = 
         TypedProgram([TypedCreate(TypeInt, "v", TypedInt(1)); TypedAssign(TypeInt, TypedVariable("v"), TypedInt(2)); TypedCreate(Type("obj-1", [("prop", TypeInt)]), "v2", TypedNew(Type("obj-1", [("prop", TypeInt)]), [TypedPropertySetter(TypeInt, "prop",TypedInt(3))]))])
-         |> expected 
+         |> expected
          (Assembly("First.exe", [Class("obj-1", [Field("prop", TypeInt)]); Class("Program", [EntryPoint([], [("v", TypeInt, 0);("", TypeInt, 1);("v2", Type("obj-1", [("prop", TypeInt)]), 2);("", TypeInt, 3);], "main", [Ldc_I4(1); Stloc(0); Ldc_I4(2); Stloc(1); Ldloc(1); Stloc(0); Newobj("obj-1") ; Stloc(2); Ldc_I4(3); Stloc(3); Ldloc(2); Ldloc(3); Stfld("obj-1", "prop"); Ret])])]))
 
     [<Fact>] 
