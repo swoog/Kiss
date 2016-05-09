@@ -49,6 +49,13 @@
         ] |> expectedTypeError "Variable is not of type float"
 
     [<Fact>] 
+    let ``Should type is incorrect when check create variable of type int and assign string value``() = 
+        [
+            Create("variableName", Int(1));
+            Assign(Variable("variableName"), String("Test"))
+        ] |> expectedTypeError "Variable is not of type string"
+
+    [<Fact>] 
     let ``Should type is correct when assign variable to create variable``() = 
         [
             Create("v1", Int(1));

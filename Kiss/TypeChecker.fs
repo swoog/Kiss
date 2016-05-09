@@ -25,6 +25,7 @@ let rec typeToString t =
     | TypeInt -> "int"
     | TypeFloat -> "float"
     | TypeBool -> "bool"
+    | TypeString -> "string"
     | TypeVoid -> "()"
     | Type(name, _) -> name
     | TypeInterface(name, _) -> name
